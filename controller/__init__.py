@@ -11,7 +11,7 @@ def index():
 @app.route('/people')
 def getNames():
     return {
-        'people': ['Filip']
+        'people': ['Filip','Vlad']
     }
 
 if __name__ == '__main__':
