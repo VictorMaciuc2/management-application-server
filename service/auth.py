@@ -1,15 +1,14 @@
 from flask import Flask,Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user
 from werkzeug.security import generate_password_hash, check_password_hash
-#from .models import User
-#from . import db
-# !!! de importat db-ul de la Marius !!!
+from domain import User
+from controller import db,app
 
-
-#De adaugat niste chestii in
 
 auth = Blueprint('auth', __name__)
-@auth.route('/signup', methods=['POST'])
+
+
+@app.route('/signup', methods=['POST'])
 def signup_post():
     email = request.form.get('email')
     name = request.form.get('name')
@@ -31,7 +30,7 @@ def signup_post():
     return redirect(url_for('auth.login'))
 
 
-@auth.route('/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
@@ -48,3 +47,7 @@ def login_post():
     # if the above check passes, then we know the user has the right credentials
     login_user(user, remember=remember)
     return redirect(url_for('main.profile'))
+
+@app.route('/test',methods =['GET'])
+def test_get():
+    return "test"
