@@ -1,31 +1,17 @@
-import string
-
-from domain.Client import Client
-
-class ServiceClient(object):
+class ServiceClient:
 
     def __init__(self, __repo):
         self.__repo = __repo
 
-    def add(self,id,name,description ):
+    def add(self,client):
         '''
-        :param id: int
-        :param name: string
-        :param description: string
+        :param client: Client
         :return:
-        raises value error if id already exists
+        raises value error if client already exists
         '''
-        if not(isinstance ( id, int)):
-            raise ValueError("id is not an integer")
-        if not(isinstance ( name, str)):
-            raise ValueError("name is not a string")
-        if not(isinstance ( description, str)):
-            raise ValueError("description is not a string")
-
-        client = self.__repo.getOne(self.__repo,id)
-        if (client != None):
+        clientfound = self.__repo.getOne(self.__repo,client.get_id())
+        if (clientfound != None):
             raise ValueError("Already exists a client with given id")
-        client = Client(id,name,description)
         self.__repo.add(self.__repo,client)
 
     def getAll(self):
