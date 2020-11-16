@@ -1,4 +1,4 @@
-class ServiceClient:
+class ClientService:
 
     def __init__(self, __repo):
         self.__repo = __repo
@@ -9,16 +9,16 @@ class ServiceClient:
         :return:
         raises value error if client already exists
         '''
-        clientfound = self.__repo.getOne(self.__repo,client.get_id())
+        clientfound = self.__repo.getOne(client.get_id())
         if (clientfound != None):
             raise ValueError("Already exists a client with given id")
-        self.__repo.add(self.__repo,client)
+        return self.__repo.add(client)
 
     def getAll(self):
         '''
         :return: lists of clients
         '''
-        clients =  self.__repo.getAll(self.__repo)
+        clients =  self.__repo.getAll()
         return clients
 
     def getOne(self,id):
@@ -27,7 +27,7 @@ class ServiceClient:
         :return: Client
          raises value error if id does not exist
         '''
-        client = self.__repo.getOne(self.__repo,id)
+        client = self.__repo.getOne(id)
         if(client==None):
             raise ValueError("Client with given id does not exist.")
         return client
@@ -39,10 +39,10 @@ class ServiceClient:
         :return:
         raise value error if id does not exist.
         '''
-        client = self.__repo.getOne(self.__repo, id)
+        client = self.__repo.getOne(id)
         if (client == None):
             raise ValueError("Client with given id does not exist.")
-        self.__repo.remove(self.__repo,client)
+        self.__repo.remove(client)
 
     def update(self,client):
         '''
@@ -51,8 +51,10 @@ class ServiceClient:
         :return:
         raise value error if id does not exist.
         '''
-        clientfound = self.__repo.getOne(self.__repo, client.get_id())
+        clientfound = self.__repo.getOne(client.get_id())
         if (clientfound == None):
             raise ValueError("Client with given id does not exist.")
 
-        self.__repo.update(self.__repo,client)
+        self.__repo.update(client)
+
+        return client
