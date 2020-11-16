@@ -1,45 +1,35 @@
-from controller import db
-from domain.client import Client
 
 class ClientRepository:
 
     def getAll(self):
-        '''
-        :return: list of clients
-        '''
+        from domain.client import Client
+
         clients = Client.query.all()
         return clients
 
     def getOne(self,id):
-        '''
-        :param id: int
-        :return: Client
-        '''
+        from domain.client import Client
+
         client = Client.query.get(id)
         return client
 
-    def add(self,Client):
-        '''
-        :param Client: Client
-        :return:
-        '''
-        db.session.add(Client)
+    def add(self,client):
+        from controller import db
+        db.session.add(client)
         db.session.commit()
+        return client
 
     def remove(self,client):
-        '''
-        :param Client: Client
-        :return:
-        '''
+        from controller import db
         db.session.delete(client)
         db.session.commit()
 
     def update(self,client):
-        '''
-        :param client: Client
-        :return:
-        '''
+        from controller import db
+        from domain.client import Client
+
         clientfound = Client.query.get(client.get_id())
         clientfound.set_name(client.get_name())
         clientfound.set_description(client.get_description())
         db.session.commit()
+        return client
