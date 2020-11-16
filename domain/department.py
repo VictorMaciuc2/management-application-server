@@ -3,29 +3,29 @@ from controller import db
 
 class Department(db.Model):
     __tablename__='Departments'
-    __id=db.Column('id', db.Integer, primary_key=True)
-    __name=db.Column('name', db.String)
-    __description = db.Column('description', db.String)
+    id=db.Column('id', db.Integer, primary_key=True)
+    name=db.Column('name', db.String)
+    description = db.Column('description', db.String)
 
     def __init__(self,id,name,description):
-        self.__id=id
-        self.__name=name
-        self.__description=description
+        self.id=id
+        self.name=name
+        self.description=description
 
     def set_id(self, value):
-        self.__id = value
+        self.id = value
 
     def set_name(self, value):
-        self.__name = value
+        self.name = value
 
     def set_description(self,value):
-        self.__description=value
+        self.description=value
 
     def get_id(self):
-        return self.__id
+        return self.id
 
     def get_name(self):
-        return self.__name
+        return self.name
 
     def get_description(self):
-        return self.__description
+        return self.description
