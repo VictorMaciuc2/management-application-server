@@ -1,13 +1,17 @@
 
-def init_db(app):
-    from flask_sqlalchemy import SQLAlchemy
-    database_uri="sqlite:///../database.db"
-    db=SQLAlchemy()
-    db.init_app(app)
-    from domain.Skill import Skill
-    app.config['SQLALCHEMY_DATABASE_URI']=database_uri
-    app.config['DEBUG']=True
-    with app.app_context():
-        db.create_all()# this creates tables in db, to work ALL MODELS NEED TO BE IMPORTED HERE
+from database.database_config import Config
+from flask_sqlalchemy import SQLAlchemy
 
-    return db
+from domain.skill import Skill
+from domain.client import Client
+from domain.technology import Technology
+from domain.department import Department
+from domain.user import User
+from domain.project import Project
+from domain.report_session import ReportSession
+from domain.report import Report
+from domain.project_technology import Project_Technology
+from domain.user_project import User_Project,db
+
+db.create_all()
+
