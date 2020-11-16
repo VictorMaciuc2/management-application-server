@@ -8,7 +8,10 @@ from domain.Technology import Technology
 from domain.Department import Department
 from domain.User import User
 from domain.Project import Project
-from domain.ReportSession import ReportSession,db
+from domain.ReportSession import ReportSession
+from domain.Report import Report
+from domain.Project_Technology import Project_Technology
+from domain.User_Project import User_Project,db
+
 db.create_all()
-#app.config.from_object(Config)
-#app.config['DEBUG']=True
+
