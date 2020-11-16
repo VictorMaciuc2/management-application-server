@@ -28,7 +28,7 @@ def login_post():
     if addedUser == None:
         return json.dumps(addedUser)
 
-    jsonUser = {'id': addedUser.id, 'email': addedUser.email, 'name': addedUser.name, 'password': addedUser.password, 'role': addedUser.role,
+    jsonUser = {'id': addedUser.id, 'email': addedUser.email, 'name': addedUser.name, 'role': addedUser.role,
              'seniority_level': addedUser.seniority_level, 'department_id': addedUser.department_id}
 
     return jsonUser
