@@ -1,15 +1,18 @@
 from flask import Flask, Blueprint, render_template, redirect, url_for, request, flash
+import json
 
 from domain import user
+from repository.user_repository import UserRepository
 from service import user_service
 from repository import user_repository
 from flask_sqlalchemy import SQLAlchemy
 
+from service.user_service import UserService
 
 auth = Blueprint('auth',__name__)
 
-userRepo = user_repository.UserRepository()
-userService = user_service.UserService(userRepo)
+userRepo = UserRepository()
+userService = UserService(userRepo)
 
 
 @auth.route('/login', methods=['POST'])
@@ -18,12 +21,17 @@ def login_post():
     email = request.json['email']
     password = request.json['password']
 
-    userPosibil = User(email, password)
-    user = userService.matchUserPassword(userPosibil)
+    from domain.user import User
+    user = User(email, password)
+    addedUser = userService.matchUserPassword(user)
 
-    user1 = {'id': user.id, 'email': user.email, 'name': user.name, 'password': user.password, 'role': user.role,
-             'seniority_level': user.seniority_level, 'department_id': user.department_id}
-    return user1
+    if addedUser == None:
+        return json.dumps(addedUser)
+
+    jsonUser = {'id': addedUser.id, 'email': addedUser.email, 'name': addedUser.name, 'password': addedUser.password, 'role': addedUser.role,
+             'seniority_level': addedUser.seniority_level, 'department_id': addedUser.department_id}
+
+    return jsonUser
 
 
 

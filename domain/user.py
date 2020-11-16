@@ -3,26 +3,26 @@ from controller import db
 
 class User(db.Model):
     __tablename__='Users'
-    __id = db.Column('id', db.Integer, primary_key=True)
-    __name = db.Column('name', db.String)
-    __email = db.Column('email', db.String)
-    __password = db.Column('password', db.String)
-    __role = db.Column('role', db.String)
-    __seniority_level=db.Column('seniority_level', db.String)
-    __department_id = db.Column(db.Integer, db.ForeignKey('Departments.id'))
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.String)
+    email = db.Column('email', db.String)
+    password = db.Column('password', db.String)
+    role = db.Column('role', db.String)
+    seniority_level=db.Column('seniority_level', db.String)
+    department_id = db.Column(db.Integer, db.ForeignKey('Departments.id'))
 
     def __init__(self,id,name,email,password,role,seniority_level,department_id):
-        self.__id=id
-        self.__name=name
-        self.__email=email
-        self.__password=password
-        self.__role=role
-        self.__seniority_level=seniority_level
-        self.__department_id=department_id
+        self.id=id
+        self.name=name
+        self.email=email
+        self.password=password
+        self.role=role
+        self.seniority_level=seniority_level
+        self.department_id=department_id
 
     def __init__(self, email, password):
-        self.__email = email
-        self.__password = password
+        self.email = email
+        self.password = password
 
     def set_id(self,value):
         self.__id=value
@@ -31,7 +31,7 @@ class User(db.Model):
         self.__name=value
 
     def set_email(self, value):
-        self.__email=value
+        self.email=value
 
     def set_password(self, value):
         self.__password=value
@@ -52,7 +52,7 @@ class User(db.Model):
         return self.__name
 
     def get_email(self):
-        return self.__email
+        return self.email
 
     def get_password(self):
         return self.__password

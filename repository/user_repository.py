@@ -1,5 +1,6 @@
-from domain import user
-class UserRepository:
 
+
+class UserRepository:
     def findByEmail(self,email):
-        return user.User.query.filter_by(email=email).first()
+        from domain.user import User
+        return User.query.filter_by(email=email).first()
