@@ -1,4 +1,4 @@
-class ServiceClient:
+class ClientService:
 
     def __init__(self, __repo):
         self.__repo = __repo

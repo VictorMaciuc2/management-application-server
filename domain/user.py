@@ -20,6 +20,10 @@ class User(db.Model):
         self.__seniority_level=seniority_level
         self.__department_id=department_id
 
+    def __init__(self, email, password):
+        self.__email = email
+        self.__password = password
+
     def set_id(self,value):
         self.__id=value
 

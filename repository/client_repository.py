@@ -1,7 +1,7 @@
 from controller import db
-from domain.Client import Client
+from domain.client import Client
 
-class RepositoryClient:
+class ClientRepository:
 
     def getAll(self):
         '''
