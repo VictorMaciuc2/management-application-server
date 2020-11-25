@@ -13,6 +13,7 @@ app = Flask(__name__)
 app.register_blueprint(user_controller.auth)
 app.register_blueprint(department_controller.deps)
 app.register_blueprint(client_controller.clients)
+app.register_blueprint(user_controller.users)
 
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
