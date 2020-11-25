@@ -1,17 +1,21 @@
-
 from database.database_config import Config
 from flask_sqlalchemy import SQLAlchemy
 
-from domain.Skill import Skill
-from domain.Client import Client
-from domain.Technology import Technology
-from domain.Department import Department
-from domain.User import User
-from domain.Project import Project
-from domain.ReportSession import ReportSession
-from domain.Report import Report
-from domain.Project_Technology import Project_Technology
-from domain.User_Project import User_Project,db
+from domain.skill import Skill
+from domain.client import Client
+from domain.technology import Technology
+from domain.department import Department
+from domain.user import User
+from domain.project import Project
+from domain.report_session import ReportSession
+from domain.report import Report
+from domain.project_technology import Project_Technology
+from domain.user_project import User_Project
 
-db.create_all()
 
+def run():
+    from controller import db
+    db.create_all()
+
+
+run()
