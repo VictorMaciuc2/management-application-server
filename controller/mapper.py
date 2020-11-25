@@ -23,7 +23,7 @@ class Mapper:
 
     def json_to_user(self, json):
         from domain.user import User
-        return User(json['email'], json['email'])
+        return User(json['email'], json['password'])
 
     def client_to_json(self, client):
         return {'id': client.id, 'name': client.name, 'description': client.description}
