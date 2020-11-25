@@ -1,7 +1,8 @@
+
+# OLD INITALIZATION - NO LONGER USED!!
+"""
 from flask import Flask
 from flask_cors import CORS
-
-from controller import UserController,DepartmentController
 
 app = Flask(__name__)
 app.register_blueprint(UserController.auth)
@@ -22,3 +23,5 @@ def getNames():
     return {
         'people': ['Filip', 'Vlad']
     }
+
+"""
