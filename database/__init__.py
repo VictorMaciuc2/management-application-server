@@ -1,4 +1,3 @@
-
 from database.database_config import Config
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,7 +10,12 @@ from domain.project import Project
 from domain.report_session import ReportSession
 from domain.report import Report
 from domain.project_technology import Project_Technology
-from domain.user_project import User_Project,db
+from domain.user_project import User_Project
 
-db.create_all()
 
+def run():
+    from controller import db
+    db.create_all()
+
+
+run()

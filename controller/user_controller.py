@@ -9,7 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from service.user_service import UserService
 
-auth = Blueprint('auth',__name__)
+auth = Blueprint('auth', __name__)
 
 userRepo = UserRepository()
 userService = UserService(userRepo)
@@ -17,21 +17,11 @@ userService = UserService(userRepo)
 
 @auth.route('/login', methods=['POST'])
 def login_post():
-    content = request.json
-    email = request.json['email']
-    password = request.json['password']
+    from controller.mapper import Mapper
 
-    from domain.user import User
-    user = User(email, password)
-    addedUser = userService.matchUserPassword(user)
+    user = userService.matchUserPassword(Mapper.get_instance().json_to_user(request.json))
 
-    if addedUser == None:
-        return json.dumps(addedUser)
+    if user is None:
+        return json.dumps(user)
 
-    jsonUser = {'id': addedUser.id, 'email': addedUser.email, 'name': addedUser.name, 'password': addedUser.password, 'role': addedUser.role,
-             'seniority_level': addedUser.seniority_level, 'department_id': addedUser.department_id}
-
-    return jsonUser
-
-
-
+    return Mapper.get_instance().user_to_json(user)
