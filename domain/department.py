@@ -2,15 +2,15 @@ from controller import db
 
 
 class Department(db.Model):
-    __tablename__='Departments'
-    id=db.Column('id', db.Integer, primary_key=True)
-    name=db.Column('name', db.String)
+    __tablename__ = 'Departments'
+    id = db.Column('id', db.Integer, primary_key=True)
+    name = db.Column('name', db.String)
     description = db.Column('description', db.String)
 
     def __init__(self,id,name,description):
-        self.id=id
-        self.name=name
-        self.description=description
+        self.id = id
+        self.name = name
+        self.description = description
 
     def set_id(self, value):
         self.id = value
@@ -19,7 +19,7 @@ class Department(db.Model):
         self.name = value
 
     def set_description(self,value):
-        self.description=value
+        self.description = value
 
     def get_id(self):
         return self.id
