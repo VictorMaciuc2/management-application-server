@@ -3,6 +3,7 @@ import string
 
 from werkzeug.security import check_password_hash
 import smtplib, ssl
+from email.message import EmailMessage
 
 class UserService:
     def __init__(self,__repo):
@@ -53,31 +54,27 @@ class UserService:
 
     def send_password_email(self,user):
 
-        gmail_user = 'adresaHRului@gmail.com'  # trebuie introduse
-        gmail_password = 'parolaHRului'        # cele corecte si adevarate ! ! !
+        gmail_user = 'colectivgrupa3@gmail.com'  # trebuie introduse
+        gmail_password = 'colectiv123!!!'        # cele corecte si adevarate ! ! !
 
-        sent_from = gmail_user
-        to = [user.get_email()]
         user.set_password(self.__get_generated_password())
-        subject = 'Your password at our company.'
-        body = 'Hello, here is your password: ' + user.get_password()
 
-        email_text="""\
-        From: %s
-        To: %s
-        Subject: %s
-        
-        %s
-        
-        
-        This is an automated e-mail. Please do not reply.
-        """ % (sent_from, ", ".join(to), subject, body)
 
+        msg = EmailMessage()
+        msg['Subject'] = 'Your password at our company.'
+        msg['From'] = gmail_user
+        # msg['To'] = user.get_email()
+        msg['To'] = gmail_user  # trimit mail-ul pe acelasi cont pentru test
+        msg.set_content('Hello, here is your password: ' + user.get_password())
+
+        
         try:
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.ehlo()
             server.starttls()
             server.login(gmail_user,gmail_password)
-            server.sendmail(sent_from,to,body)
+            #server.sendmail(sent_from,to,user.get_password()+"parola") #nu mere bine
+            server.send_message(msg)
+
         except:
             return None
