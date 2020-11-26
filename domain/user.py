@@ -3,12 +3,12 @@ from controller import db
 
 class User(db.Model):
     __tablename__='Users'
-    id = db.Column('id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.String)
     email = db.Column('email', db.String)
     password = db.Column('password', db.String)
-    role = db.Column('role', db.String)
-    seniority_level=db.Column('seniority_level', db.String)
+    role = db.Column('role', db.SmallInteger)
+    seniority_level=db.Column('seniority_level', db.SmallInteger)
     department_id = db.Column(db.Integer, db.ForeignKey('Departments.id'))
 
     def __init__(self,id,name,email,password,role,seniority_level,department_id):
@@ -20,48 +20,47 @@ class User(db.Model):
         self.seniority_level=seniority_level
         self.department_id=department_id
 
-    def __init__(self, email, password):
-        self.email = email
-        self.password = password
-
     def set_id(self,value):
-        self.__id=value
+        self.id=value
 
     def set_name(self, value):
-        self.__name=value
+        self.name=value
 
     def set_email(self, value):
         self.email=value
 
     def set_password(self, value):
-        self.__password=value
+        self.password=value
 
     def set_role(self,value):
-        self.__role=value
+        self.role=value
 
     def set_seniority_level(self, value):
-        self.__seniority_level=value
+        self.seniority_level=value
 
     def set_department_id(self, value):
-        self.__department_id=value
+        self.department_id=value
+
+    def set_department(self, value):
+        self.department = value
 
     def get_id(self):
-        return self.__id
+        return self.id
 
     def get_name(self):
-        return self.__name
+        return self.name
 
     def get_email(self):
         return self.email
 
     def get_password(self):
-        return self.__password
+        return self.password
 
     def get_role(self):
-        return self.__role
+        return self.role
 
     def get_seniority_level(self):
-        return self.__seniority_level
+        return self.seniority_level
 
     def get_department_id(self):
-        return self.__department_id
+        return self.department_id

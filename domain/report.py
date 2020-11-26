@@ -3,7 +3,7 @@ from controller import db
 
 class Report(db.Model):
     __tablename__='Reports'
-    id=db.Column('id', db.Integer, primary_key=True)
+    id=db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user_id=db.Column(db.Integer, db.ForeignKey('Users.id'))
     skill_id = db.Column(db.Integer, db.ForeignKey('Skills.id'))
     project_id=db.Column(db.Integer, db.ForeignKey('Projects.id'))
@@ -15,15 +15,18 @@ class Report(db.Model):
         self.__name=name
         self.__description=description
 
-
     def set_user_id(self,value):
         self.user_id=value
+
     def set_skill_up(self,value):
         self.skill_id=value
+
     def set_project_id(self,value):
         self.project_id=value
+
     def set_mark(self,value):
         self.project_id=value
+
     def set_date(self,value):
         self.date=value
 
@@ -35,11 +38,15 @@ class Report(db.Model):
 
     def get_user_id(self):
         return self.user_id
+
     def get_skill_id(self):
         return self.skill_id
+
     def get_project_id(self):
         return self.project_id
+
     def get_mark(self):
         return self.mark
+
     def get_date(self):
         return self.date
