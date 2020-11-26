@@ -3,7 +3,7 @@ from controller import db
 
 class Department(db.Model):
     __tablename__ = 'Departments'
-    id = db.Column('id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.String)
     description = db.Column('description', db.String)
 

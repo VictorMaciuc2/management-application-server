@@ -1,7 +1,7 @@
 from controller import db
 class ReportSession(db.Model):
     __tablename__='ReportSessions'
-    id=db.Column('id', db.Integer, primary_key=True)
+    id=db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     project_id=db.Column(db.Integer, db.ForeignKey('Projects.id'))
     user_id=db.Column(db.Integer, db.ForeignKey('Users.id'))
     start_date=db.Column('start_date', db.Date)

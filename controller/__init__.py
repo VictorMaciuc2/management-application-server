@@ -2,9 +2,6 @@ from flask_cors import CORS
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
-from domain import user
-from controller.mapper import Mapper
-
 from controller import user_controller
 from controller import client_controller
 from controller import department_controller
