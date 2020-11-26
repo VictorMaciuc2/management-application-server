@@ -27,7 +27,7 @@ class DepartmentRepository:
         from controller import db
         from domain.department import Department
 
-        departmentfound = department.query.get(department.get_id())
+        departmentfound = Department.query.get(department.get_id())
         departmentfound.set_name(department.get_name())
         departmentfound.set_description(department.get_description())
         db.session.commit()
