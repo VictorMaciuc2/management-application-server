@@ -3,7 +3,7 @@ from controller import db
 
 class Project_Technology(db.Model):
     __tablename__ = 'Project_Technology'
-    id = db.Column('id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     technology_id = db.Column(db.Integer, db.ForeignKey('Technologies.id'))
     project_id = db.Column(db.Integer, db.ForeignKey('Projects.id'))
 

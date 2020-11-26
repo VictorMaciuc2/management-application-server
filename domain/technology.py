@@ -1,7 +1,7 @@
 from controller import db
 class Technology(db.Model):
     __tablename__="Technologies"
-    id=db.Column('id', db.Integer, primary_key=True)
+    id=db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name=db.Column('name', db.String)
 
     def __init__(self, id, name):

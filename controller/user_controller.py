@@ -2,7 +2,10 @@ import json
 
 from flask import Blueprint
 from flask import jsonify, request
+
+from repository.department_repository import DepartmentRepository
 from repository.user_repository import UserRepository
+from service.department_service import DepartmentService
 from service.user_service import UserService
 from controller.mapper import Mapper
 from werkzeug.security import generate_password_hash
@@ -15,12 +18,13 @@ auth = Blueprint('auth', __name__)
 
 userRepo = UserRepository()
 userService = UserService(userRepo)
-
+department_repo = DepartmentRepository()
+department_service = DepartmentService(department_repo)
 
 @auth.route('/login', methods=['POST'])
 def login_post():
     from controller.mapper import Mapper
-    user = userService.matchUserPassword(Mapper.get_instance().json_to_user(request.json))
+    user = userService.matchUserPassword(request.json['email'], request.json['password'])
     if user is None:
         return json.dumps(user)
 
@@ -32,7 +36,11 @@ def get_users():
     user_id = request.args.get('userid')
     if user_id is None:
         # get all users
-        return jsonify([Mapper.get_instance().user_to_json(user) for user in user_service.getAll()])
+        users = []
+        for user in user_service.getAll():
+            user.set_department(department_service.getOne(user.department_id))
+            users.append(Mapper.get_instance().user_to_json(user))
+        return jsonify(users)
     else:
         # get one user
         user = user_service.getOne(user_id)
@@ -45,6 +53,7 @@ def save_user():
     user_service.send_password_email(user) # old, plain text password is used to send it as an email to the user
     user.set_password(generate_password_hash(user.get_password())) # method : "pbkdf2:sha256"
     user_service.add(user)
+    user.set_department(department_service.getOne(user.department_id))
     return Mapper.get_instance().user_to_json(user)
 
 
@@ -52,6 +61,7 @@ def save_user():
 def update_user():
     user = Mapper.get_instance().json_to_user(request.json)
     user_service.update(user)
+    user.set_department(department_service.getOne(user.department_id))
     return Mapper.get_instance().user_to_json(user)
 
 

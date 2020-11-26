@@ -24,7 +24,7 @@ class Mapper:
 
     def json_to_user(self, json):
         from domain.user import User
-        return User(json['email'], json['password'])
+        return User(json['id'], json['name'], json['email'], None, json['role'], json['seniorityLevel'], json['departmentId'])
 
     def json_to_project(self, json):
         from domain.project import Project
@@ -40,8 +40,7 @@ class Mapper:
         return {'id': department.id, 'name': department.name, 'description': department.description}
 
     def user_to_json(self, user):
-        return {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role,
-                'seniority_level': user.seniority_level, 'department_id': user.department_id}
+        return {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role, 'seniorityLevel': user.seniority_level, 'departmentId': user.department_id, 'department': self.department_to_json(user.department)}
 
     def project_to_json(self, project):
         return {'id': project.get_id(), 'name': project.get_name(), 'description': project.get_description(),

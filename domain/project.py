@@ -4,9 +4,9 @@ from controller import db
 
 
 class Project(db.Model):
-    __tablename__ = 'Projects'
-    id = db.Column('id', db.Integer, primary_key=True)
-    name = db.Column('name', db.String)
+    __tablename__='Projects'
+    id=db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    name=db.Column('name', db.String)
     description = db.Column('description', db.String)
     start_date = db.Column('start_date', db.Date)
     end_date = db.Column('end_date', db.Date)

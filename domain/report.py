@@ -5,7 +5,7 @@ from controller import db
 #    anumit skill (skill_id).
 class Report(db.Model):
     __tablename__ = 'Reports'
-    id = db.Column('id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))  # ID-ul userului caruia i s-a facut report-ul
     skill_id = db.Column(db.Integer, db.ForeignKey('Skills.id'))  # Skill-ul pentru care s-a facut report
     project_id = db.Column(db.Integer, db.ForeignKey('Projects.id'))  # Proiectul in cadrul caruia s-a primit feedback
