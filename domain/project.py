@@ -1,7 +1,7 @@
 from controller import db
 class Project(db.Model):
     __tablename__='Projects'
-    id=db.Column('id', db.Integer, primary_key=True)
+    id=db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name=db.Column('name', db.String)
     description = db.Column('description', db.String)
     start_date=db.Column('start_date', db.Date)
@@ -17,7 +17,6 @@ class Project(db.Model):
         self.client_id=client_id
         self.start_date=start_date
         self.deadline_date=end_date
-
 
     def get_id(self):
         return self.id

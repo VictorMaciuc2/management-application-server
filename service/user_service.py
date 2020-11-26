@@ -1,3 +1,6 @@
+import secrets
+import string
+
 from werkzeug.security import check_password_hash
 import smtplib, ssl
 
@@ -5,13 +8,12 @@ class UserService:
     def __init__(self,__repo):
         self.__repo = __repo
 
-    def matchUserPassword(self, user):
-        email = user.get_email()
+    def matchUserPassword(self, email, password):
         addedUser = self.__repo.findByEmail(email)
-        if not addedUser or (check_password_hash(addedUser.get_password(),user.get_password()) is False):  # verify hash
+        if not addedUser or addedUser.get_password() != password:
+                # TODO: Skip for now: (check_password_hash(addedUser.get_password(), password) is False):  # verify hash
             return None  # if the user doesn't exist or password is wrong, return null
         return addedUser
-
 
     def add(self,user):
         userfound = self.__repo.getOne(user.get_id())
@@ -44,6 +46,11 @@ class UserService:
 
         return user
 
+    def __get_generated_password(self):
+        alphabet = string.ascii_letters + string.digits
+        return ''.join(secrets.choice(alphabet) for i in range(20))
+
+
     def send_password_email(self,user):
 
         gmail_user = 'adresaHRului@gmail.com'  # trebuie introduse
@@ -51,6 +58,7 @@ class UserService:
 
         sent_from = gmail_user
         to = [user.get_email()]
+        user.set_password(self.__get_generated_password())
         subject = 'Your password at our company.'
         body = 'Hello, here is your password: ' + user.get_password()
 
