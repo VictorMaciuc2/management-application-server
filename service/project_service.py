@@ -1,8 +1,9 @@
 class ProjectService:
-    def __init__(self, __repo, technology_service, project_technology_repo, client_service):
+    def __init__(self, __repo, project_technology_repo, user_project_repo, technology_service, client_service):
         self.__project_repo = __repo
-        self.__tech_service = technology_service
         self.__project_tech_repo = project_technology_repo
+        self.__user_project_repo = user_project_repo
+        self.__tech_service = technology_service
         self.__client_service = client_service
 
     def getAll(self):

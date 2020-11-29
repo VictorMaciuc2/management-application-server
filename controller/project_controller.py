@@ -5,12 +5,14 @@ from controller.mapper import Mapper
 from repository.project_repository import ProjectRepository
 from repository.technology_repository import TechnologyRepository
 from repository.project_technology_repository import ProjectTechnologyRepository
+from repository.user_project_repository import UserProjectRepository
 from service.project_service import ProjectService
 from service.technology_service import TechnologyService
 from controller.client_controller import client_service
 
 technology_service = TechnologyService(TechnologyRepository())
-project_service = ProjectService(ProjectRepository(), technology_service, ProjectTechnologyRepository(), client_service)
+project_service = ProjectService(ProjectRepository(), ProjectTechnologyRepository(), UserProjectRepository(),
+                                 technology_service, client_service)
 
 projects = Blueprint('projects', __name__)
 
