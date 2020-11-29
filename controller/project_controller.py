@@ -1,13 +1,16 @@
 from flask import Blueprint
 from flask import jsonify, request
 
-from repository.project_repository import ProjectRepository
 from controller.mapper import Mapper
+from repository.project_repository import ProjectRepository
+from repository.technology_repository import TechnologyRepository
+from repository.project_technology_repository import ProjectTechnologyRepository
 from service.project_service import ProjectService
+from service.technology_service import TechnologyService
 from controller.client_controller import client_service
 
-project_repo = ProjectRepository()
-project_service = ProjectService(project_repo)
+technology_service = TechnologyService(TechnologyRepository())
+project_service = ProjectService(ProjectRepository(), technology_service, ProjectTechnologyRepository(), client_service)
 
 projects = Blueprint('projects', __name__)
 
@@ -24,7 +27,7 @@ def get_all_projects():
 @projects.route('/projects', methods=['POST'])
 def save_project():
     project = Mapper.get_instance().json_to_project(request.json)
-    __check_project_client(project)
+    __check_project_client(project) #TODO
     project_service.add(project)
     return Mapper.get_instance().project_to_json(project)
 
