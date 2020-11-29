@@ -18,6 +18,7 @@ class ProjectService:
         p = self.__project_repo.getOne(project.get_id())
         if p is not None:
             raise ValueError("A project with the given ID already exists.")
+        self.__client_service.getOne(project.get_client_id())  # Throws ValueError if client does not exist
         return self.__project_repo.add(project)
 
     def remove(self, id):
@@ -30,4 +31,6 @@ class ProjectService:
         p = self.__project_repo.getOne(project.get_id())
         if p is None:
             raise ValueError("The project with the given ID does not exist.")
+        if p.get_client_id() != project.get_client_id():
+            self.__client_service.getOne(project.get_client_id())  # Throws ValueError if client does not exist
         return self.__project_repo.update(project)

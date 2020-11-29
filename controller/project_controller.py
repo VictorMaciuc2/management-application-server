@@ -27,7 +27,6 @@ def get_all_projects():
 @projects.route('/projects', methods=['POST'])
 def save_project():
     project = Mapper.get_instance().json_to_project(request.json)
-    __check_project_client(project) #TODO
     project_service.add(project)
     return Mapper.get_instance().project_to_json(project)
 
@@ -35,7 +34,6 @@ def save_project():
 @projects.route('/projects', methods=['PUT'])
 def update_project():
     project = Mapper.get_instance().json_to_project(request.json)
-    __check_project_client(project)
     project_service.update(project)
     return Mapper.get_instance().project_to_json(project)
 
@@ -45,8 +43,3 @@ def delete_project():
     project_id = request.args.get('projectid')
     project_service.remove(project_id)
     return jsonify(success=True)
-
-
-def __check_project_client(project):
-    if client_service.getOne(project.get_client_id()) is None:  # crapa de pe linia asta
-        raise ValueError("The client with the given ID does not exist.")
