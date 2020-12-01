@@ -4,7 +4,7 @@ from datetime import datetime
 class Mapper:
     __instance = None
     __date_format = '%Y-%m-%d'  # YYYY-MM-DD
-    __date_time_format = '%Y-%m-%d_%H:%M:%S'
+    __date_time_format = '%Y-%m-%d_%H:%M:%S'  # YYYY-MM-DD_hh:mm:ss
 
     def __init__(self):
         Mapper.__instance = self
@@ -14,6 +14,12 @@ class Mapper:
         if Mapper.__instance is None:
             return Mapper()
         return Mapper.__instance
+
+    def json_to_date(self, json):
+        return datetime.strptime(json, Mapper.__date_format)
+
+    def json_to_date_time(self, json):
+        return datetime.strptime(json, Mapper.__date_time_format)
 
     def json_to_client(self, json):
         from domain.client import Client
@@ -30,10 +36,8 @@ class Mapper:
 
     def json_to_project(self, json):
         from domain.project import Project
-        return Project(json['id'], json['name'], json['description'],
-                       datetime.strptime(json['start_date'], Mapper.__date_format),
-                       datetime.strptime(json['end_date'], Mapper.__date_format),
-                       datetime.strptime(json['deadline_date'], Mapper.__date_format), json['client_id'])
+        return Project(json['id'], json['name'], json['description'], self.json_to_date(json['start_date']),
+                       self.json_to_date(json['end_date']), self.json_to_date(json['deadline_date']), json['client_id'])
 
     def json_to_technology(self, json):
         from domain.technology import Technology
@@ -46,6 +50,16 @@ class Mapper:
             reports.append(Report(x['id'], x['user_id'], x['skill_id'], x['project_id'], x['mark'], None))
             # 'date' nu vine de la client
         return reports
+
+    def json_to_report_sessions(self, json):
+        from domain.report_session import ReportSession
+        project_id = json['project_id']
+        start_date = self.json_to_date_time(json['start_date'])
+        end_date = self.json_to_date_time(json['end_date'])
+        sessions = []
+        for user_id in json['users']:
+            sessions.append(ReportSession(0, project_id, user_id, start_date, end_date, False))
+        return sessions
 
     def client_to_json(self, client):
         return {'id': client.id, 'name': client.name, 'description': client.description}

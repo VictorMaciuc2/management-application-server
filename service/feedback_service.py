@@ -7,6 +7,24 @@ class FeedbackService:
     def getAllSkills(self):
         return self.__skills_repo.getAll()
 
+    def getAllReportSessions(self):
+        pass  # TODO
+
+    def getAllReportSessionsForUser(self, userId):
+        pass
+
+    def getAllReportSessionsForProject(self, userId):
+        pass
+
+    def addReportSession(self, reportSession):
+        pass
+
+    def removeReportSessions(self, projectId, startDate, endDate):
+        pass  # Returns int
+
+    def addReport(self, sessionId, report):
+        pass
+
     # Apelata doar manual
     def populateSkills(self):
         from domain.skill import Skill
