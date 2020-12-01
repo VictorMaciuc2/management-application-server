@@ -8,14 +8,17 @@ from repository.project_technology_repository import ProjectTechnologyRepository
 from repository.user_project_repository import UserProjectRepository
 from service.project_service import ProjectService
 from service.technology_service import TechnologyService
+from controller.user_controller import user_service
 from controller.client_controller import client_service
+from controller.department_controller import department_service
 
 technology_service = TechnologyService(TechnologyRepository())
 project_service = ProjectService(ProjectRepository(), ProjectTechnologyRepository(), UserProjectRepository(),
-                                 technology_service, client_service)
+                                 technology_service, user_service, client_service)
 
 projects = Blueprint('projects', __name__)
 __tech_path = '/projects/technologies'
+__users_path = '/projects/users'
 
 
 @projects.route('/projects', methods=['GET'])
@@ -57,9 +60,13 @@ def get_technologies():
 
     if tech_id is None:
         return jsonify(
-            [Mapper.get_instance().technology_to_json(x) for x in project_service.getTechnologiesForProject(project_id)])
+            [Mapper.get_instance().technology_to_json(x) for x in
+             project_service.getTechnologiesForProject(project_id)])
 
-    return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
+    if project_id is None:
+        return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
+
+    return jsonify(assigned=project_service.isTechAssignedToProject(project_id, tech_id))
 
 
 # O tehnologie nu poate exista daca nu e asignata la minimum 1 proiect
@@ -69,7 +76,7 @@ def get_technologies():
 def assign_tech():
     project_id = request.args.get('projectid')
     tech = Mapper.get_instance().json_to_technology(request.json)
-    project_service.assign_tech_to_project(project_id, tech)
+    project_service.assignTechToProject(project_id, tech)
     return Mapper.get_instance().technology_to_json(tech)
 
 
@@ -77,5 +84,38 @@ def assign_tech():
 def unassign_tech():
     project_id = request.args.get('projectid')
     tech_id = request.args.get('techid')
-    project_service.unassign_tech_from_project(project_id, tech_id)
+    project_service.unassignTechFromProject(project_id, tech_id)
+    return jsonify(success=True)
+
+
+@projects.route(__users_path, methods=['GET'])
+def get_users():
+    project_id = request.args.get('projectid')
+    user_id = request.args.get('userid')
+    if project_id is not None and user_id is not None:
+        return jsonify(assigned=project_service.isUserAssignedToProject(project_id, user_id))
+
+    if project_id is not None:
+        users = project_service.getUsersForProject(project_id)
+        for x in users:
+            x.set_department(department_service.getOne(x.get_department_id()))
+        return jsonify([Mapper.get_instance().user_to_json(x) for x in users])
+
+    if user_id is not None:
+        return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])
+
+
+@projects.route(__users_path, methods=['POST'])
+def assign_user():
+    project_id = request.args.get('projectid')
+    user_id = request.args.get('userid')
+    project_service.assignUserToProject(project_id, user_id)
+    return jsonify(success=True)
+
+
+@projects.route(__users_path, methods=['DELETE'])
+def unassign_user():
+    project_id = request.args.get('projectid')
+    user_id = request.args.get('userid')
+    project_service.unassignUserFromProject(project_id, user_id)
     return jsonify(success=True)
