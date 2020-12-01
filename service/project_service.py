@@ -27,6 +27,10 @@ class ProjectService:
         project = self.__project_repo.getOne(id)
         if project is None:
             raise ValueError("The project with the given ID does not exist.")
+        for x in self.getTechnologiesForProject(id):
+            self.unassignTechFromProject(id, x.get_id())
+        for x in self.getUsersForProject(id):
+            self.unassignUserFromProject(id, x.get_id())
         self.__project_repo.remove(project)
 
     def updateProject(self, project):
