@@ -57,9 +57,13 @@ def get_technologies():
 
     if tech_id is None:
         return jsonify(
-            [Mapper.get_instance().technology_to_json(x) for x in project_service.getTechnologiesForProject(project_id)])
+            [Mapper.get_instance().technology_to_json(x) for x in
+             project_service.getTechnologiesForProject(project_id)])
 
-    return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
+    if project_id is None:
+        return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
+    
+    return jsonify(assigned=project_service.isTechAssignedToProject(project_id, tech_id))
 
 
 # O tehnologie nu poate exista daca nu e asignata la minimum 1 proiect

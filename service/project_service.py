@@ -56,6 +56,9 @@ class ProjectService:
         if not self.__project_tech_repo.getAllForTechnology(techId):  # Lista goala
             self.__tech_service.remove(techId)
 
+    def isTechAssignedToProject(self, projectId, techId):
+        return self.__project_tech_repo.getOne(projectId, techId) is not None
+
     def getUsersForProject(self, projectId):
         return self.__user_project_repo.getAllForProject(projectId)  # TODO
 
