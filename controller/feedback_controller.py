@@ -20,6 +20,8 @@ projects = Blueprint('projects', __name__)
 __tech_path = '/projects/technologies'
 __users_path = '/projects/users'
 
+# Get la report sessions by userid
+# Post la un report
 
 @projects.route('/projects', methods=['GET'])
 def get_all_projects():
@@ -97,8 +99,9 @@ def get_users():
 
     if project_id is not None:
         users = project_service.getUsersForProject(project_id)
-        return jsonify(
-            [Mapper.get_instance().user_to_json(x, department_service.getOne(x.get_department_id())) for x in users])
+        for x in users:
+            x.set_department(department_service.getOne(x.get_department_id()))
+        return jsonify([Mapper.get_instance().user_to_json(x) for x in users])
 
     if user_id is not None:
         return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])

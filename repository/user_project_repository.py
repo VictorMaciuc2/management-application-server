@@ -8,7 +8,7 @@ class UserProjectRepository:
     def getOne(self, userId, projectId):
         from domain.user_project import User_Project
 
-        pt = User_Project.query.get(userId, projectId)
+        pt = User_Project.query.get((userId, projectId))
         return pt
 
     def getAllForProject(self, projectId):

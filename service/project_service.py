@@ -1,9 +1,10 @@
 class ProjectService:
-    def __init__(self, __repo, project_technology_repo, user_project_repo, technology_service, client_service):
+    def __init__(self, __repo, project_technology_repo, user_project_repo, technology_service, user_service, client_service):
         self.__project_repo = __repo
         self.__project_tech_repo = project_technology_repo
         self.__user_project_repo = user_project_repo
         self.__tech_service = technology_service
+        self.__user_service = user_service
         self.__client_service = client_service
 
     def getAllProjects(self):
@@ -26,6 +27,10 @@ class ProjectService:
         project = self.__project_repo.getOne(id)
         if project is None:
             raise ValueError("The project with the given ID does not exist.")
+        for x in self.getTechnologiesForProject(id):
+            self.unassignTechFromProject(id, x.get_id())
+        for x in self.getUsersForProject(id):
+            self.unassignUserFromProject(id, x.get_id())
         self.__project_repo.remove(project)
 
     def updateProject(self, project):
@@ -36,7 +41,7 @@ class ProjectService:
             self.__client_service.getOne(project.get_client_id())  # Throws ValueError if client does not exist
         return self.__project_repo.update(project)
 
-    def assign_tech_to_project(self, projectId, tech):
+    def assignTechToProject(self, projectId, tech):
         from domain.project_technology import Project_Technology
         try:
             self.__tech_service.getOne(tech.get_id())
@@ -46,7 +51,7 @@ class ProjectService:
         self.__project_tech_repo.add(Project_Technology(projectId, tech.get_id()))
         return tech
 
-    def unassign_tech_from_project(self, projectId, techId):
+    def unassignTechFromProject(self, projectId, techId):
         pt = self.__project_tech_repo.getOne(projectId, techId)
         if pt is None:
             raise ValueError("Technology was not assigned to project")
@@ -56,14 +61,33 @@ class ProjectService:
         if not self.__project_tech_repo.getAllForTechnology(techId):  # Lista goala
             self.__tech_service.remove(techId)
 
+    def isTechAssignedToProject(self, projectId, techId):
+        return self.__project_tech_repo.getOne(projectId, techId) is not None
+
+    def assignUserToProject(self, projectId, userId):
+        from domain.user_project import User_Project
+        self.getOneProject(projectId)
+        self.__user_service.getOne(userId)
+        self.__user_project_repo.add(User_Project(userId, projectId))
+
+    def unassignUserFromProject(self, projectId, userId):
+        up = self.__user_project_repo.getOne(userId, projectId)
+        if up is None:
+            raise ValueError("User was not assigned to project")
+        self.__user_project_repo.remove(up)
+
+    def isUserAssignedToProject(self, projectId, userId):
+        return self.__user_project_repo.getOne(userId, projectId) is not None
+
     def getUsersForProject(self, projectId):
-        return self.__user_project_repo.getAllForProject(projectId)  # TODO
+        return [self.__user_service.getOne(x.get_user_id()) for x in self.__user_project_repo.getAllForProject(projectId)]
 
     def getTechnologiesForProject(self, projectId):
-        return [self.__tech_service.getOne(x.get_technology_id()) for x in self.__project_tech_repo.getAllForProject(projectId)]
+        return [self.__tech_service.getOne(x.get_technology_id()) for x in
+                self.__project_tech_repo.getAllForProject(projectId)]
 
     def getProjectsForUser(self, userId):
-        return self.__user_project_repo.getAllForUser(userId)  # TODO
+        return [self.getOneProject(x.get_project_id()) for x in self.__user_project_repo.getAllForUser(userId)]
 
     def getProjectsForTechnology(self, techId):
         return [self.getOneProject(x.get_project_id()) for x in self.__project_tech_repo.getAllForTechnology(techId)]
