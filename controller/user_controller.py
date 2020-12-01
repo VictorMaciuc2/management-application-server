@@ -38,13 +38,12 @@ def get_users():
         # get all users
         users = []
         for user in user_service.getAll():
-            user.set_department(department_service.getOne(user.department_id))
-            users.append(Mapper.get_instance().user_to_json(user))
+            users.append(Mapper.get_instance().user_to_json(user, department_service.getOne(user.department_id)))
         return jsonify(users)
     else:
         # get one user
         user = user_service.getOne(user_id)
-        return Mapper.get_instance().user_to_json(user)
+        return Mapper.get_instance().user_to_json(user, department_service.getOne(user.department_id))
 
 
 @users.route('/users', methods=['POST'])
