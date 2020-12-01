@@ -76,7 +76,7 @@ class ProjectService:
         return self.__user_project_repo.getOne(userId, projectId) is not None
 
     def getUsersForProject(self, projectId):
-        return [x.get_user_id() for x in self.__user_project_repo.getAllForProject(projectId)]
+        return [self.__user_service.getOne(x.get_user_id()) for x in self.__user_project_repo.getAllForProject(projectId)]
 
     def getTechnologiesForProject(self, projectId):
         return [self.__tech_service.getOne(x.get_technology_id()) for x in

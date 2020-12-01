@@ -10,6 +10,7 @@ from service.project_service import ProjectService
 from service.technology_service import TechnologyService
 from controller.user_controller import user_service
 from controller.client_controller import client_service
+from controller.department_controller import department_service
 
 technology_service = TechnologyService(TechnologyRepository())
 project_service = ProjectService(ProjectRepository(), ProjectTechnologyRepository(), UserProjectRepository(),
@@ -95,7 +96,10 @@ def get_users():
         return jsonify(assigned=project_service.isUserAssignedToProject(project_id, user_id))
 
     if project_id is not None:
-        return jsonify([{'id': x} for x in project_service.getUsersForProject(project_id)])
+        users = project_service.getUsersForProject(project_id)
+        for x in users:
+            x.set_department(department_service.getOne(x.get_department_id()))
+        return jsonify([Mapper.get_instance().user_to_json(x) for x in users])
 
     if user_id is not None:
         return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])
