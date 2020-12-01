@@ -38,16 +38,19 @@ class Mapper:
         from domain.technology import Technology
         return Technology(json['id'], json['name'])
 
+    def json_to_report(self, json):
+        return 'x'
+
     def client_to_json(self, client):
         return {'id': client.id, 'name': client.name, 'description': client.description}
 
     def department_to_json(self, department):
         return {'id': department.id, 'name': department.name, 'description': department.description}
 
-    def user_to_json(self, user):
+    def user_to_json(self, user, department):
         return {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role,
                 'seniorityLevel': user.seniority_level, 'departmentId': user.department_id,
-                'department': self.department_to_json(user.department)}
+                'department': self.department_to_json(department)}
 
     def project_to_json(self, project):
         return {'id': project.get_id(), 'name': project.get_name(), 'description': project.get_description(),
@@ -58,4 +61,6 @@ class Mapper:
 
     def technology_to_json(self, tech):
         return {'id': tech.get_id(), 'name': tech.get_name()}
-   
+
+    def report_session_to_json(self, rs):
+        return {'id': rs.get_id()}  # TODO
