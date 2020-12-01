@@ -65,8 +65,8 @@ class UserService:
         msg = EmailMessage()
         msg['Subject'] = 'Your password at our company.'
         msg['From'] = gmail_user
-        # msg['To'] = user.get_email()
-        msg['To'] = gmail_user  # trimit mail-ul pe acelasi cont pentru test
+        msg['To'] = user.get_email()
+        # msg['To'] = gmail_user  # trimit mail-ul pe acelasi cont pentru test
         msg.set_content('Hello, here is your password: ' + user.get_password())
 
         try:
