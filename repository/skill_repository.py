@@ -1,4 +1,4 @@
-class UserProjectRepository:
+class SkillRepository:
     def getAll(self):
         from domain.skill import Skill
 
