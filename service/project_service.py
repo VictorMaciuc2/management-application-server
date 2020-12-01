@@ -36,7 +36,7 @@ class ProjectService:
             self.__client_service.getOne(project.get_client_id())  # Throws ValueError if client does not exist
         return self.__project_repo.update(project)
 
-    def assign_tech_to_project(self, projectId, tech):
+    def assignTechToProject(self, projectId, tech):
         from domain.project_technology import Project_Technology
         try:
             self.__tech_service.getOne(tech.get_id())
@@ -46,7 +46,7 @@ class ProjectService:
         self.__project_tech_repo.add(Project_Technology(projectId, tech.get_id()))
         return tech
 
-    def unassign_tech_from_project(self, projectId, techId):
+    def unassignTechFromProject(self, projectId, techId):
         pt = self.__project_tech_repo.getOne(projectId, techId)
         if pt is None:
             raise ValueError("Technology was not assigned to project")

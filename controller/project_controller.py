@@ -69,7 +69,7 @@ def get_technologies():
 def assign_tech():
     project_id = request.args.get('projectid')
     tech = Mapper.get_instance().json_to_technology(request.json)
-    project_service.assign_tech_to_project(project_id, tech)
+    project_service.assignTechToProject(project_id, tech)
     return Mapper.get_instance().technology_to_json(tech)
 
 
@@ -77,5 +77,5 @@ def assign_tech():
 def unassign_tech():
     project_id = request.args.get('projectid')
     tech_id = request.args.get('techid')
-    project_service.unassign_tech_from_project(project_id, tech_id)
+    project_service.unassignTechFromProject(project_id, tech_id)
     return jsonify(success=True)
