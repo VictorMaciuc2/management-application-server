@@ -15,6 +15,14 @@ class Mapper:
             return Mapper()
         return Mapper.__instance
 
+    @staticmethod
+    def get_date_format():
+        return Mapper.__date_format
+
+    @staticmethod
+    def get_date_time_format():
+        return Mapper.__date_time_format
+
     def json_to_date(self, json):
         return datetime.strptime(json, Mapper.__date_format)
 
@@ -47,8 +55,8 @@ class Mapper:
         from domain.report import Report
         reports = []
         for x in json['reports']:
-            reports.append(Report(x['id'], x['user_id'], x['skill_id'], x['project_id'], x['mark'], None))
-            # 'date' nu vine de la client
+            reports.append(Report(None, x['user_id'], x['skill_id'], x['project_id'], x['mark'], None))
+            # 'id' si 'date' nu vin de la client
         return reports
 
     def client_to_json(self, client):

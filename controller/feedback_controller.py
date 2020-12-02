@@ -27,14 +27,20 @@ def get_report_sessions():
     project_id = request.args.get('projectid')
     if user_id is None and project_id is None:
         return jsonify(
-            [Mapper.get_instance().report_session_to_json(x) for x in feedback_service.getAllReportSessions()])
+            [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
+             feedback_service.getAllReportSessions()])
 
     if user_id is not None:
-        return jsonify([Mapper.get_instance().report_session_to_json(x) for x in
-                        feedback_service.getAllReportSessionsForUser(user_id)])
+        return jsonify(
+            [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
+             feedback_service.getAllReportSessionsForUser(user_id)])
 
     if project_id is not None:
-        return jsonify(feedback_service.getAllReportSessionsForProject(project_id))
+        list = feedback_service.getAllReportSessionsForProject(project_id)
+        for x in list:
+            x['start_date'] = x['start_date'].strftime(Mapper.get_date_time_format())
+            x['end_date'] = x['end_date'].strftime(Mapper.get_date_time_format())
+        return jsonify(list)
 
 
 # Va deschide un report session pentru fiecare user membru al proiectului dat
@@ -50,9 +56,9 @@ def add_report_sessions():
 # Va sterge doar report session-urile necompletate
 @feedback.route(__report_sessions_path, methods=['DELETE'])
 def delete_report_sessions():
-    project_id = request.args.get('projectid')
-    start_date = Mapper.get_instance().json_to_date_time(request.args.get('startdate'))
-    end_date = Mapper.get_instance().json_to_date_time(request.args.get('enddate'))
+    project_id = request.json['project_id']
+    start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
+    end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
     count = feedback_service.removeReportSessions(project_id, start_date, end_date)
     return jsonify(removed=count)
 

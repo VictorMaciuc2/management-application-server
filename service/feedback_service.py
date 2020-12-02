@@ -35,9 +35,13 @@ class FeedbackService:
 
     def addReportSessions(self, projectId, startDate, endDate):
         from domain.report_session import ReportSession
+
+        if startDate >= endDate:
+            raise ValueError("Invalid start/end dates")
+
         count = 0
         for user in self.__project_service.getUsersForProject(projectId):
-            self.__report_session_repo.add(ReportSession(0, projectId, user.get_id(), startDate, endDate, False))
+            self.__report_session_repo.add(ReportSession(None, projectId, user.get_id(), startDate, endDate, False))
             count += 1
         return count
 
@@ -65,9 +69,30 @@ class FeedbackService:
             raise ValueError("The report session has ended")
 
         count = 0
+        check = []
         for report in reports:
+            if report.get_user_id() == session.get_user_id():  # Nu isi poate da feedback singur
+                continue
+
+            if not self.__project_service.isUserAssignedToProject(report.get_user_id(), session.get_project_id()):
+                continue
+
+            if self.__skills_repo.getOne(report.get_skill_id()) is None:
+                continue
+
+            tup = (report.get_user_id(), report.get_skill_id())
+            if tup in check:
+                continue
+
+            check.append(tup)
+
+            report.set_id(None)  # Autoincrement
+            report.set_date(currentTime)
             self.__report_repo.add(report)
             count += 1
+
+        session.set_was_completed(True)
+        self.__report_session_repo.update(session)
         return count
 
     # Apelata doar manual
