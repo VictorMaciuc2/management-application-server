@@ -28,7 +28,7 @@ def login_post():
     if user is None:
         return json.dumps(user)
 
-    return Mapper.get_instance().user_to_json(user)
+    return Mapper.get_instance().user_to_json(user, department_service.getOne(user.department_id))
 
 
 @users.route('/users', methods=['GET'])
