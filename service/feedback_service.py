@@ -8,15 +8,30 @@ class FeedbackService:
         return self.__skills_repo.getAll()
 
     def getAllReportSessions(self):
-        pass  # TODO
+        return self.__report_session_repo.getAll()
 
     def getAllReportSessionsForUser(self, userId):
-        pass
+        return self.__report_session_repo.getAllForUser(userId)
 
-    def getAllReportSessionsForProject(self, userId):
-        pass
+    def getAllReportSessionsForProject(self, projectId):
+        rs = self.__report_session_repo.getAllForProject(projectId)
 
-    def addReportSession(self, reportSession):
+        dictionar = {}
+        for x in rs:
+            if (x.get_project_id(), x.get_start_date(), x.get_end_date()) not in dictionar:
+                dictionar[(x.get_project_id(), x.get_start_date(), x.get_end_date())] = (0, 1)
+            else:
+                dictionar[(x.get_project_id(), x.get_start_date(), x.get_end_date())][1] += 1
+            if x.get_was_completed() is True:
+                dictionar[(x.get_project_id(), x.get_start_date(), x.get_end_date())][0] += 1
+
+        out = []
+        for key in dictionar.keys():
+            out.append({'projectId': key[0], 'start_date': key[1], 'end_date': key[2], 'completed': dictionar[key][0],
+                        'total': dictionar[key][1]})
+        return out
+
+    def addReportSession(self, projectId, startDate, endDate):
         pass
 
     def removeReportSessions(self, projectId, startDate, endDate):

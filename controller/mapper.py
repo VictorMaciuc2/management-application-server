@@ -51,16 +51,6 @@ class Mapper:
             # 'date' nu vine de la client
         return reports
 
-    def json_to_report_sessions(self, json):
-        from domain.report_session import ReportSession
-        project_id = json['project_id']
-        start_date = self.json_to_date_time(json['start_date'])
-        end_date = self.json_to_date_time(json['end_date'])
-        sessions = []
-        for user_id in json['users']:
-            sessions.append(ReportSession(0, project_id, user_id, start_date, end_date, False))
-        return sessions
-
     def client_to_json(self, client):
         return {'id': client.id, 'name': client.name, 'description': client.description}
 

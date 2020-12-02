@@ -2,10 +2,12 @@ from flask import Blueprint
 from flask import jsonify, request
 
 from controller.mapper import Mapper
+from repository.report_repository import ReportRepository
+from repository.report_session_repository import ReportSessionRepository
 from repository.skill_repository import SkillRepository
 from service.feedback_service import FeedbackService
 
-feedback_service = FeedbackService(None, None, SkillRepository())
+feedback_service = FeedbackService(ReportRepository(), ReportSessionRepository(), SkillRepository())
 
 feedback = Blueprint('feedback', __name__)
 __base_path = '/feedback'
@@ -31,20 +33,15 @@ def get_report_sessions():
                         feedback_service.getAllReportSessionsForUser(user_id)])
 
     if project_id is not None:
-        return jsonify([Mapper.get_instance().report_session_to_json(x) for x in
-                        feedback_service.getAllReportSessionsForProject(user_id)])
+        return jsonify(feedback_service.getAllReportSessionsForProject(project_id))
 
 
 @feedback.route(__report_sessions_path, methods=['POST'])
 def add_report_sessions():
-    sessions = Mapper.get_instance().json_to_report_sessions(request.json)
-    count = 0
-    for s in sessions:
-        try:
-            feedback_service.addReportSession(s)
-            count += 1
-        except ValueError:
-            continue
+    project_id = request.json['project_id']
+    start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
+    end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
+    count = feedback_service.addReportSession(project_id, start_date, end_date)
     return jsonify(added=count)
 
 
