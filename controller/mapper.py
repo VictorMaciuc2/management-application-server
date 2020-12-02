@@ -47,9 +47,12 @@ class Mapper:
         return Project(json['id'], json['name'], json['description'], self.json_to_date(json['start_date']),
                        self.json_to_date(json['end_date']), self.json_to_date(json['deadline_date']), json['client_id'])
 
-    def json_to_technology(self, json):
+    def json_to_technologies(self, json):
         from domain.technology import Technology
-        return Technology(json['id'], json['name'])
+        techs = []
+        for x in json['technologies']:
+            techs.append(Technology(x['id'], x['name']))
+        return techs
 
     def json_to_reports(self, json):
         from domain.report import Report
