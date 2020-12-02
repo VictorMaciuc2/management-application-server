@@ -1,8 +1,9 @@
 class FeedbackService:
-    def __init__(self, report_repo, report_session_repo, skills_repo):
+    def __init__(self, report_repo, report_session_repo, skills_repo, project_service):
         self.__report_repo = report_repo
         self.__report_session_repo = report_session_repo
         self.__skills_repo = skills_repo
+        self.__project_service = project_service
 
     def getAllSkills(self):
         return self.__skills_repo.getAll()
@@ -33,12 +34,23 @@ class FeedbackService:
         return out
 
     def addReportSessions(self, projectId, startDate, endDate):
-        pass
+        from domain.report_session import ReportSession
+        count = 0
+        for user in self.__project_service.getUsersForProject(projectId):
+            self.__report_session_repo.add(ReportSession(0, projectId, user.get_id(), startDate, endDate, False))
+            count += 1
+        return count
 
     def removeReportSessions(self, projectId, startDate, endDate):
-        pass  # Returns int
+        sessions = self.__report_session_repo.getAllForProject(projectId)
+        count = 0
+        for x in sessions:
+            if x.get_start_date() == startDate and x.get_end_date() == endDate and x.get_was_completed() is False:
+                self.__report_session_repo.remove(x)
+                count += 1
+        return count
 
-    def addReport(self, sessionId, report):
+    def addReports(self, sessionId, report):
         pass
 
     # Apelata doar manual

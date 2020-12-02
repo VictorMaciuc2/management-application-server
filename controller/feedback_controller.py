@@ -6,8 +6,9 @@ from repository.report_repository import ReportRepository
 from repository.report_session_repository import ReportSessionRepository
 from repository.skill_repository import SkillRepository
 from service.feedback_service import FeedbackService
+from controller.project_controller import project_service
 
-feedback_service = FeedbackService(ReportRepository(), ReportSessionRepository(), SkillRepository())
+feedback_service = FeedbackService(ReportRepository(), ReportSessionRepository(), SkillRepository(), project_service)
 
 feedback = Blueprint('feedback', __name__)
 __base_path = '/feedback'
@@ -59,11 +60,5 @@ def delete_report_sessions():
 @feedback.route(__base_path, methods=['POST'])
 def add_reports():
     report_session_id = request.args.get('sessionid')
-    count = 0
-    for report in Mapper.get_instance().json_to_reports(request.json):
-        try:
-            feedback_service.addReport(report_session_id, report)
-            count += 1
-        except ValueError:
-            continue
+    count = feedback_service.addReports(report_session_id, Mapper.get_instance().json_to_reports(request.json))
     return jsonify(added=count)
