@@ -4,6 +4,7 @@ from datetime import datetime
 class Mapper:
     __instance = None
     __date_format = '%Y-%m-%d'  # YYYY-MM-DD
+    __date_time_format = '%Y-%m-%d_%H:%M:%S'  # YYYY-MM-DD_hh:mm:ss
 
     def __init__(self):
         Mapper.__instance = self
@@ -13,6 +14,20 @@ class Mapper:
         if Mapper.__instance is None:
             return Mapper()
         return Mapper.__instance
+
+    @staticmethod
+    def get_date_format():
+        return Mapper.__date_format
+
+    @staticmethod
+    def get_date_time_format():
+        return Mapper.__date_time_format
+
+    def json_to_date(self, json):
+        return datetime.strptime(json, Mapper.__date_format)
+
+    def json_to_date_time(self, json):
+        return datetime.strptime(json, Mapper.__date_time_format)
 
     def json_to_client(self, json):
         from domain.client import Client
@@ -29,17 +44,23 @@ class Mapper:
 
     def json_to_project(self, json):
         from domain.project import Project
-        return Project(json['id'], json['name'], json['description'],
-                       datetime.strptime(json['start_date'], Mapper.__date_format),
-                       datetime.strptime(json['end_date'], Mapper.__date_format),
-                       datetime.strptime(json['deadline_date'], Mapper.__date_format), json['client_id'])
+        return Project(json['id'], json['name'], json['description'], self.json_to_date(json['start_date']),
+                       self.json_to_date(json['end_date']), self.json_to_date(json['deadline_date']), json['client_id'])
 
-    def json_to_technology(self, json):
+    def json_to_technologies(self, json):
         from domain.technology import Technology
-        return Technology(json['id'], json['name'])
+        techs = []
+        for x in json['technologies']:
+            techs.append(Technology(x['id'], x['name']))
+        return techs
 
-    def json_to_report(self, json):
-        return 'x'
+    def json_to_reports(self, json):
+        from domain.report import Report
+        reports = []
+        for x in json['reports']:
+            reports.append(Report(None, x['user_id'], x['skill_id'], x['project_id'], x['mark'], None))
+            # 'id' si 'date' nu vin de la client
+        return reports
 
     def client_to_json(self, client):
         return {'id': client.id, 'name': client.name, 'description': client.description}
@@ -62,5 +83,11 @@ class Mapper:
     def technology_to_json(self, tech):
         return {'id': tech.get_id(), 'name': tech.get_name()}
 
-    def report_session_to_json(self, rs):
-        return {'id': rs.get_id()}  # TODO
+    def report_session_to_json(self, rs, project):
+        return {'id': rs.get_id(), 'start_date': rs.get_start_date().strftime(Mapper.__date_time_format),
+                'end_date': rs.get_end_date().strftime(Mapper.__date_time_format),
+                'was_completed': rs.get_was_completed(), 'user_id': rs.get_user_id(),
+                'project': self.project_to_json(project)}
+
+    def skill_to_json(self, skill):
+        return {'id': skill.get_id(), 'name': skill.get_name()}
