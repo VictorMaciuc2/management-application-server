@@ -50,8 +50,25 @@ class FeedbackService:
                 count += 1
         return count
 
-    def addReports(self, sessionId, report):
-        pass
+    def addReports(self, sessionId, reports, currentTime):
+        session = self.__report_session_repo.getOne(sessionId)
+        if session is None:
+            raise ValueError("The given report session does not exist")
+
+        if session.get_was_completed() is True:
+            raise ValueError("The report session was already completed")
+
+        if currentTime < session.get_start_date():
+            raise ValueError("The report session has not yet started")
+
+        if currentTime > session.get_end_date():
+            raise ValueError("The report session has ended")
+
+        count = 0
+        for report in reports:
+            self.__report_repo.add(report)
+            count += 1
+        return count
 
     # Apelata doar manual
     def populateSkills(self):

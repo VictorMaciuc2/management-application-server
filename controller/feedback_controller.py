@@ -59,6 +59,8 @@ def delete_report_sessions():
 
 @feedback.route(__base_path, methods=['POST'])
 def add_reports():
+    from datetime import datetime
     report_session_id = request.args.get('sessionid')
-    count = feedback_service.addReports(report_session_id, Mapper.get_instance().json_to_reports(request.json))
+    count = feedback_service.addReports(report_session_id, Mapper.get_instance().json_to_reports(request.json),
+                                        datetime.now())
     return jsonify(added=count)
