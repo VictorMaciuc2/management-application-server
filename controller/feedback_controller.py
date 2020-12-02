@@ -36,12 +36,13 @@ def get_report_sessions():
         return jsonify(feedback_service.getAllReportSessionsForProject(project_id))
 
 
+# Va deschide un report session pentru fiecare user membru al proiectului dat
 @feedback.route(__report_sessions_path, methods=['POST'])
 def add_report_sessions():
     project_id = request.json['project_id']
     start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
     end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
-    count = feedback_service.addReportSession(project_id, start_date, end_date)
+    count = feedback_service.addReportSessions(project_id, start_date, end_date)
     return jsonify(added=count)
 
 

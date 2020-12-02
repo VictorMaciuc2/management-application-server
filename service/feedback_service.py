@@ -18,12 +18,13 @@ class FeedbackService:
 
         dictionar = {}
         for x in rs:
-            if (x.get_project_id(), x.get_start_date(), x.get_end_date()) not in dictionar:
-                dictionar[(x.get_project_id(), x.get_start_date(), x.get_end_date())] = (0, 1)
+            tup = (x.get_project_id(), x.get_start_date(), x.get_end_date())
+            if tup not in dictionar:
+                dictionar[tup] = (0, 1)
             else:
-                dictionar[(x.get_project_id(), x.get_start_date(), x.get_end_date())][1] += 1
+                dictionar[tup][1] += 1
             if x.get_was_completed() is True:
-                dictionar[(x.get_project_id(), x.get_start_date(), x.get_end_date())][0] += 1
+                dictionar[tup][0] += 1
 
         out = []
         for key in dictionar.keys():
@@ -31,7 +32,7 @@ class FeedbackService:
                         'total': dictionar[key][1]})
         return out
 
-    def addReportSession(self, projectId, startDate, endDate):
+    def addReportSessions(self, projectId, startDate, endDate):
         pass
 
     def removeReportSessions(self, projectId, startDate, endDate):
