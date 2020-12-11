@@ -2,122 +2,71 @@ from flask import Blueprint
 from flask import jsonify, request
 
 from controller.mapper import Mapper
-from repository.project_repository import ProjectRepository
-from repository.technology_repository import TechnologyRepository
-from repository.project_technology_repository import ProjectTechnologyRepository
-from repository.user_project_repository import UserProjectRepository
-from service.project_service import ProjectService
-from service.technology_service import TechnologyService
-from controller.user_controller import user_service
-from controller.client_controller import client_service
-from controller.department_controller import department_service
+from repository.report_repository import ReportRepository
+from repository.report_session_repository import ReportSessionRepository
+from repository.skill_repository import SkillRepository
+from service.feedback_service import FeedbackService
+from controller.project_controller import project_service
 
-technology_service = TechnologyService(TechnologyRepository())
-project_service = ProjectService(ProjectRepository(), ProjectTechnologyRepository(), UserProjectRepository(),
-                                 technology_service, user_service, client_service)
+feedback_service = FeedbackService(ReportRepository(), ReportSessionRepository(), SkillRepository(), project_service)
 
-projects = Blueprint('projects', __name__)
-__tech_path = '/projects/technologies'
-__users_path = '/projects/users'
-
-# Get la report sessions by userid
-# Post la un report
-
-@projects.route('/projects', methods=['GET'])
-def get_all_projects():
-    project_id = request.args.get('projectid')
-    if project_id is None:
-        return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getAllProjects()])
-    else:
-        return Mapper.get_instance().project_to_json(project_service.getOneProject(project_id))
+feedback = Blueprint('feedback', __name__)
+__base_path = '/feedback'
+__report_sessions_path = __base_path + '/sessions'
+__skills_path = __base_path + '/skills'
 
 
-@projects.route('/projects', methods=['POST'])
-def save_project():
-    project = Mapper.get_instance().json_to_project(request.json)
-    project_service.addProject(project)
-    return Mapper.get_instance().project_to_json(project)
+@feedback.route(__skills_path, methods=['GET'])
+def get_all_skills():
+    return jsonify([Mapper.get_instance().skill_to_json(x) for x in feedback_service.getAllSkills()])
 
 
-@projects.route('/projects', methods=['PUT'])
-def update_project():
-    project = Mapper.get_instance().json_to_project(request.json)
-    project_service.updateProject(project)
-    return Mapper.get_instance().project_to_json(project)
-
-
-@projects.route('/projects', methods=['DELETE'])
-def delete_project():
-    project_id = request.args.get('projectid')
-    project_service.removeProject(project_id)
-    return jsonify(success=True)
-
-
-@projects.route(__tech_path, methods=['GET'])
-def get_technologies():
-    project_id = request.args.get('projectid')
-    tech_id = request.args.get('techid')
-    if project_id is None and tech_id is None:
-        return jsonify([Mapper.get_instance().technology_to_json(x) for x in technology_service.getAll()])
-
-    if tech_id is None:
-        return jsonify(
-            [Mapper.get_instance().technology_to_json(x) for x in
-             project_service.getTechnologiesForProject(project_id)])
-
-    if project_id is None:
-        return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
-
-    return jsonify(assigned=project_service.isTechAssignedToProject(project_id, tech_id))
-
-
-# O tehnologie nu poate exista daca nu e asignata la minimum 1 proiect
-# Daca nu exista deja, tehnologia e creata si adaugata
-# Returneaza tehnologia pentru a putea lua noul ID in caz ca a fost creata
-@projects.route(__tech_path, methods=['POST'])
-def assign_tech():
-    project_id = request.args.get('projectid')
-    tech = Mapper.get_instance().json_to_technology(request.json)
-    project_service.assignTechToProject(project_id, tech)
-    return Mapper.get_instance().technology_to_json(tech)
-
-
-@projects.route(__tech_path, methods=['DELETE'])
-def unassign_tech():
-    project_id = request.args.get('projectid')
-    tech_id = request.args.get('techid')
-    project_service.unassignTechFromProject(project_id, tech_id)
-    return jsonify(success=True)
-
-
-@projects.route(__users_path, methods=['GET'])
-def get_users():
-    project_id = request.args.get('projectid')
+@feedback.route(__report_sessions_path, methods=['GET'])
+def get_report_sessions():
     user_id = request.args.get('userid')
-    if project_id is not None and user_id is not None:
-        return jsonify(assigned=project_service.isUserAssignedToProject(project_id, user_id))
-
-    if project_id is not None:
-        users = project_service.getUsersForProject(project_id)
-        for x in users:
-            x.set_department(department_service.getOne(x.get_department_id()))
-        return jsonify([Mapper.get_instance().user_to_json(x) for x in users])
+    project_id = request.args.get('projectid')
+    if user_id is None and project_id is None:
+        return jsonify(
+            [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
+             feedback_service.getAllReportSessions()])
 
     if user_id is not None:
-        return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])
+        return jsonify(
+            [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
+             feedback_service.getAllReportSessionsForUser(user_id)])
+
+    if project_id is not None:
+        list = feedback_service.getAllReportSessionsForProject(project_id)
+        for x in list:
+            x['start_date'] = x['start_date'].strftime(Mapper.get_date_time_format())
+            x['end_date'] = x['end_date'].strftime(Mapper.get_date_time_format())
+        return jsonify(list)
 
 
-@projects.route(__users_path, methods=['POST'])
-def assign_user():
-    project_id = request.args.get('projectid')
-    user_id = request.args.get('userid')
-    project_service.assignUserToProject(project_id, user_id)
-    return jsonify(success=True)
+# Va deschide un report session pentru fiecare user membru al proiectului dat
+@feedback.route(__report_sessions_path, methods=['POST'])
+def add_report_sessions():
+    project_id = request.json['project_id']
+    start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
+    end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
+    count = feedback_service.addReportSessions(project_id, start_date, end_date)
+    return jsonify(added=count)
 
 
-@projects.route(__users_path, methods=['DELETE'])
-def unassign_user():
-    project_id = request.args.get('projectid')
-    user_id = request.args.get('userid')
-    project_service.unassignUserFromProject(project_id, user_id)
-    return jsonify(success=True)
+# Va sterge doar report session-urile necompletate
+@feedback.route(__report_sessions_path, methods=['DELETE'])
+def delete_report_sessions():
+    project_id = request.json['project_id']
+    start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
+    end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
+    count = feedback_service.removeReportSessions(project_id, start_date, end_date)
+    return jsonify(removed=count)
+
+
+@feedback.route(__base_path, methods=['POST'])
+def add_reports():
+    from datetime import datetime
+    report_session_id = request.args.get('sessionid')
+    count = feedback_service.addReports(report_session_id, Mapper.get_instance().json_to_reports(request.json),
+                                        datetime.now())
+    return jsonify(added=count)

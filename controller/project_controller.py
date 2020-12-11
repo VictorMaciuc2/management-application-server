@@ -71,13 +71,13 @@ def get_technologies():
 
 # O tehnologie nu poate exista daca nu e asignata la minimum 1 proiect
 # Daca nu exista deja, tehnologia e creata si adaugata
-# Returneaza tehnologia pentru a putea lua noul ID in caz ca a fost creata
 @projects.route(__tech_path, methods=['POST'])
-def assign_tech():
+def assign_techs():
     project_id = request.args.get('projectid')
-    tech = Mapper.get_instance().json_to_technology(request.json)
-    project_service.assignTechToProject(project_id, tech)
-    return Mapper.get_instance().technology_to_json(tech)
+    techs = Mapper.get_instance().json_to_technologies(request.json)
+    for tech in techs:
+        project_service.assignTechToProject(project_id, tech)
+    return jsonify(success=True)
 
 
 @projects.route(__tech_path, methods=['DELETE'])
@@ -105,10 +105,10 @@ def get_users():
 
 
 @projects.route(__users_path, methods=['POST'])
-def assign_user():
+def assign_users():
     project_id = request.args.get('projectid')
-    user_id = request.args.get('userid')
-    project_service.assignUserToProject(project_id, user_id)
+    for user in request.json['users']:
+        project_service.assignUserToProject(project_id, user['id'])
     return jsonify(success=True)
 
 

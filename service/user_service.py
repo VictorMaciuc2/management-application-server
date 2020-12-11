@@ -56,7 +56,6 @@ class UserService:
         return ''.join(secrets.choice(alphabet) for i in range(20))
 
     def send_password_email(self, user):
-
         gmail_user = 'colectivgrupa3@gmail.com'  # trebuie introduse
         gmail_password = 'colectiv123!!!'  # cele corecte si adevarate ! ! !
 
@@ -65,8 +64,8 @@ class UserService:
         msg = EmailMessage()
         msg['Subject'] = 'Your password at our company.'
         msg['From'] = gmail_user
-        # msg['To'] = user.get_email()
-        msg['To'] = gmail_user  # trimit mail-ul pe acelasi cont pentru test
+        msg['To'] = user.get_email()
+        # msg['To'] = gmail_user  # trimit mail-ul pe acelasi cont pentru test
         msg.set_content('Hello, here is your password: ' + user.get_password())
 
         try:
@@ -74,7 +73,6 @@ class UserService:
             server.ehlo()
             server.starttls()
             server.login(gmail_user, gmail_password)
-            # server.sendmail(sent_from,to,user.get_password()+"parola") #nu mere bine
             server.send_message(msg)
 
         except:
