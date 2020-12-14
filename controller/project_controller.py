@@ -19,6 +19,7 @@ project_service = ProjectService(ProjectRepository(), ProjectTechnologyRepositor
 projects = Blueprint('projects', __name__)
 __tech_path = '/projects/technologies'
 __users_path = '/projects/users'
+__tech_users_path = '/users/technologies'
 
 
 @projects.route('/projects', methods=['GET'])
@@ -118,3 +119,7 @@ def unassign_user():
     user_id = request.args.get('userid')
     project_service.unassignUserFromProject(project_id, user_id)
     return jsonify(success=True)
+
+@projects.route(__tech_users_path, methods=['GET'])
+def get_users_by_technology():
+    return jsonify(project_service.get_technologies_and_users_with_recommandation())
