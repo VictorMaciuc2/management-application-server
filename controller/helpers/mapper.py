@@ -31,11 +31,11 @@ class Mapper:
 
     def json_to_client(self, json):
         from domain.client import Client
-        return json if json is None else Client(json['id'], json['name'], json['description'])
+        return json if json is None else Client(json['id'], json['name'], "" if json['description'] is None else json['description'])
 
     def json_to_department(self, json):
         from domain.department import Department
-        return json if json is None else Department(json['id'], json['name'], json['description'])
+        return json if json is None else Department(json['id'], json['name'], "" if json['description'] is None else json['description'])
 
     def json_to_user(self, json):
         from domain.user import User
@@ -44,7 +44,8 @@ class Mapper:
 
     def json_to_project(self, json):
         from domain.project import Project
-        return json if json is None else Project(json['id'], json['name'], json['description'],
+        return json if json is None else Project(json['id'], json['name'],
+                       "" if json['description'] is None else json['description'],
                        datetime.strptime(json['startDate'], Mapper.__date_format),
                        None if json['endDate'] is None else datetime.strptime(json['endDate'], Mapper.__date_format),
                        datetime.strptime(json['deadlineDate'], Mapper.__date_format), json['clientId'])
@@ -69,7 +70,8 @@ class Mapper:
         return client if client is None else {'id': client.id, 'name': client.name, 'description': client.description}
 
     def department_to_json(self, department):
-        return department if department is None else {'id': department.id, 'name': department.name, 'description': department.description}
+        return department if department is None else {'id': department.id, 'name': department.name,
+                                                      'description': department.description}
 
     def user_to_json(self, user, department):
         return user if user is None else {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role,
@@ -77,7 +79,8 @@ class Mapper:
                 'department': self.department_to_json(department)}
 
     def project_to_json(self, project):
-        return project if project is None else {'id': project.get_id(), 'name': project.get_name(), 'description': project.get_description(),
+        return project if project is None else {'id': project.get_id(), 'name': project.get_name(),
+                'description': project.get_description(),
                 'startDate': project.get_start_date().strftime(Mapper.__date_format),
                 'endDate': None if project.get_end_date() is None else project.get_end_date().strftime(Mapper.__date_format),
                 'deadlineDate': project.get_deadline_date().strftime(Mapper.__date_format),
