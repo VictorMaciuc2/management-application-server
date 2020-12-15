@@ -1,7 +1,8 @@
 from flask import Blueprint
 from flask import jsonify, request
 
-from controller.mapper import Mapper
+from controller.helpers.authorize import auth_required
+from controller.helpers.mapper import Mapper
 from repository.report_repository import ReportRepository
 from repository.report_session_repository import ReportSessionRepository
 from repository.skill_repository import SkillRepository
@@ -17,11 +18,13 @@ __skills_path = __base_path + '/skills'
 
 
 @feedback.route(__skills_path, methods=['GET'])
+@auth_required
 def get_all_skills():
     return jsonify([Mapper.get_instance().skill_to_json(x) for x in feedback_service.getAllSkills()])
 
 
 @feedback.route(__report_sessions_path, methods=['GET'])
+@auth_required
 def get_report_sessions():
     user_id = request.args.get('userid')
     project_id = request.args.get('projectid')
@@ -45,6 +48,7 @@ def get_report_sessions():
 
 # Va deschide un report session pentru fiecare user membru al proiectului dat
 @feedback.route(__report_sessions_path, methods=['POST'])
+@auth_required
 def add_report_sessions():
     project_id = request.json['project_id']
     start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
@@ -55,6 +59,7 @@ def add_report_sessions():
 
 # Va sterge doar report session-urile necompletate
 @feedback.route(__report_sessions_path, methods=['DELETE'])
+@auth_required
 def delete_report_sessions():
     project_id = request.json['project_id']
     start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
@@ -64,6 +69,7 @@ def delete_report_sessions():
 
 
 @feedback.route(__base_path, methods=['POST'])
+@auth_required
 def add_reports():
     from datetime import datetime
     report_session_id = request.args.get('sessionid')
