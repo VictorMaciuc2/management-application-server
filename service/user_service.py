@@ -67,7 +67,7 @@ class UserService:
         msg['To'] = gmail_user  # trimit mail-ul pe acelasi cont pentru test
         msg.set_content('Hello, here is your password: ' + user.get_password())
 
-        
+
         try:
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.ehlo()
