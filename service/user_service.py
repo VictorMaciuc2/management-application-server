@@ -78,9 +78,8 @@ class UserService:
             server.starttls()
             server.login(gmail_user, gmail_password)
             server.send_message(msg)
-
-        except:
-            return None
+        except smtplib.SMTPException:
+            raise ValueError("Could not send registration email.")
 
     def generate_token(self, user_id):
         user = self.__repo.getOne(user_id)

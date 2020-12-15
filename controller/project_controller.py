@@ -41,7 +41,7 @@ def get_all_projects():
         try:
             return Mapper.get_instance().project_to_json(project_service.getOneProject(project_id))
         except ValueError as err:
-            return Response(err, 400)
+            return Response(str(err), 400)
 
 
 @projects.route('/projects', methods=['POST'])
@@ -51,7 +51,7 @@ def save_project():
     try:
         project_service.addProject(project)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().project_to_json(project)
 
 
@@ -62,7 +62,7 @@ def update_project():
     try:
         project_service.updateProject(project)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().project_to_json(project)
 
 
@@ -73,7 +73,7 @@ def delete_project():
     try:
         project_service.removeProject(project_id)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return jsonify(success=True)
 
 
@@ -85,20 +85,19 @@ def get_technologies():
     if project_id is None and tech_id is None:
         return jsonify([Mapper.get_instance().technology_to_json(x) for x in technology_service.getAll()])
 
-    try:
-        if tech_id is None:
+    if tech_id is None:
+        try:
             return jsonify(
                 [Mapper.get_instance().technology_to_json(x) for x in
                  project_service.getTechnologiesForProject(project_id)])
-    except ValueError as err:
-        return Response(err, 400)
+        except ValueError as err:
+            return Response(str(err), 400)
 
-    try:
-        if project_id is None:
+    if project_id is None:
+        try:
             return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
-    except ValueError as err:
-        return Response(err, 400)
-
+        except ValueError as err:
+          return Response(str(err), 400)
 
     return jsonify(assigned=project_service.isTechAssignedToProject(project_id, tech_id))
 
@@ -115,7 +114,7 @@ def assign_techs():
             project_service.assignTechToProject(project_id, tech)
         return jsonify(success=True)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
 
 
 @projects.route(__tech_path, methods=['DELETE'])
@@ -127,7 +126,8 @@ def unassign_tech():
         project_service.unassignTechFromProject(project_id, tech_id)
         return jsonify(success=True)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
+
 
 @projects.route(__users_path, methods=['GET'])
 @auth_required
@@ -137,19 +137,19 @@ def get_users():
     if project_id is not None and user_id is not None:
         return jsonify(assigned=project_service.isUserAssignedToProject(project_id, user_id))
 
-    try:
-        if project_id is not None:
+    if project_id is not None:
+        try:
             users = project_service.getUsersForProject(project_id)
             return jsonify(
                  [Mapper.get_instance().user_to_json(x, Mapper.get_instance().department_to_json(department_service.getOne(x.get_department_id()))) for x in users])
-    except ValueError as err:
-        return Response(err, 400)
+        except ValueError as err:
+            return Response(str(err), 400)
 
-    try:
-        if user_id is not None:
+    if user_id is not None:
+        try:
             return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])
-    except ValueError as err:
-        return Response(err, 400)
+        except ValueError as err:
+            return Response(str(err), 400)
 
 
 @projects.route(__users_path, methods=['POST'])
@@ -161,7 +161,7 @@ def assign_users():
             project_service.assignUserToProject(project_id, user['id'])
         return jsonify(success=True)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
 
 
 @projects.route(__users_path, methods=['DELETE'])
@@ -173,7 +173,8 @@ def unassign_user():
         project_service.unassignUserFromProject(project_id, user_id)
         return jsonify(success=True)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
+
 
 @projects.route(__tech_users_path, methods=['GET'])
 @auth_required
