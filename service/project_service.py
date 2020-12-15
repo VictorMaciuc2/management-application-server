@@ -1,3 +1,8 @@
+from datetime import datetime, date, timedelta
+
+from controller.mapper import Mapper
+
+
 class ProjectService:
     def __init__(self, __repo, project_technology_repo, user_project_repo, technology_service, user_service, client_service):
         self.__project_repo = __repo
@@ -91,3 +96,28 @@ class ProjectService:
 
     def getProjectsForTechnology(self, techId):
         return [self.getOneProject(x.get_project_id()) for x in self.__project_tech_repo.getAllForTechnology(techId)]
+
+    def get_technologies_and_users_with_recommandation(self):
+        technologies = []
+        for technology in self.__tech_service.getAll():
+            technology = Mapper.get_instance().technology_to_json(technology)
+            technology['users'] = []
+            for user in self.__user_service.getAll():
+                experience_in_days = 0
+                for user_project in self.__user_project_repo.getAllForUser(user.id):
+                    project = self.__project_repo.getOne(user_project.project_id)
+                    project_technology = self.__project_tech_repo.getOne(project.id, technology['id'])
+                    if project_technology is not None:
+                        difference = (datetime.now().date() if project.end_date is None else project.end_date) - project.start_date
+                        experience_in_days += difference.days
+
+                technology['users'].append({
+                    'id': user.id,
+                    'name': user.name,
+                    'experienceInDays': experience_in_days
+                })
+
+            technologies.append(technology)
+
+        return technologies
+
