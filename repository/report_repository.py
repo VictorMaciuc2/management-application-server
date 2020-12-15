@@ -3,6 +3,10 @@ class ReportRepository:
         from domain.report import Report
         return Report.query.all()
 
+    def getAllForProject(self, projectId):
+        from domain.report import Report
+        return Report.query.filter(Report.project_id == projectId).all()
+
     def getOne(self, reportId):
         from domain.report import Report
         return Report.query.get(reportId)

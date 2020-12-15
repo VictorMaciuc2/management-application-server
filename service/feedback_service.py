@@ -106,6 +106,19 @@ class FeedbackService:
         self.__report_session_repo.update(session)
         return count
 
+    # Deletes all reports report sessions, regardless of completed or not. Used when deleting projects
+    def forceDeleteFeedbackDataForProject(self, projectId):
+        from controller.project_controller import project_service
+        project_service.getOneProject(projectId)  # raises ValueError if project with projectId does not exist
+
+        sessions = self.__report_session_repo.getAllForProject(projectId)
+        for x in sessions:
+            self.__report_session_repo.remove(x)
+
+        reports = self.__report_repo.getAllForProject(projectId)
+        for x in reports:
+            self.__report_repo.remove(x)
+
     # Apelata doar manual
     def populateSkills(self):
         from domain.skill import Skill
