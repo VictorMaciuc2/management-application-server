@@ -42,8 +42,8 @@ class UserService:
         if (user == None):
             raise ValueError("User with given id does not exist.")
         from controller.project_controller import project_service
-        for project in project_service.getProjectsForUser(id):
-            project_service.unassignUserFromProject(project.get_id(), id)
+        for project in project_service.getProjectsForUser(user.get_id()):
+            project_service.unassignUserFromProject(project.get_id(), user.get_id())
         self.__repo.remove(user)
 
     def update(self, user):

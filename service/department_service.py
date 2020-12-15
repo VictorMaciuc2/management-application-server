@@ -25,7 +25,7 @@ class DepartmentService:
 
         from controller.user_controller import user_service
         for user in user_service.getAll():
-            if user.get_department_id() == id:
+            if user.get_department_id() == department.get_id():
                 raise ValueError("Cannot delelte department with assigned users.")
 
         self.__repo.remove(department)

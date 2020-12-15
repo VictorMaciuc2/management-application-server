@@ -33,13 +33,13 @@ class ProjectService:
         project = self.__project_repo.getOne(id)
         if project is None:
             raise ValueError("The project with the given ID does not exist.")
-        for x in self.getTechnologiesForProject(id):
-            self.unassignTechFromProject(id, x.get_id())
-        for x in self.getUsersForProject(id):
-            self.unassignUserFromProject(id, x.get_id())
+        for x in self.getTechnologiesForProject(project.get_id()):
+            self.unassignTechFromProject(project.get_id(), x.get_id())
+        for x in self.getUsersForProject(project.get_id()):
+            self.unassignUserFromProject(project.get_id(), x.get_id())
 
         from controller.feedback_controller import feedback_service
-        feedback_service.forceDeleteFeedbackDataForProject(id)
+        feedback_service.forceDeleteFeedbackDataForProject(project.get_id())
 
         self.__project_repo.remove(project)
 

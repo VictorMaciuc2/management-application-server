@@ -25,7 +25,7 @@ class ClientService:
 
         from controller.project_controller import project_service
         for proj in project_service.getAllProjects():
-            if proj.get_client_id() == id:
+            if proj.get_client_id() == client.get_id():
                 raise ValueError("Cannot delete client with assigned projects.")
 
         self.__repo.remove(client)
