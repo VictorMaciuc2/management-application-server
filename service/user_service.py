@@ -1,9 +1,13 @@
 import secrets
 import string
+from datetime import datetime, timedelta
 
+import jwt
 from werkzeug.security import check_password_hash
 import smtplib, ssl
 from email.message import EmailMessage
+
+from domain.enums.role import Role
 
 
 class UserService:
@@ -77,3 +81,14 @@ class UserService:
 
         except:
             return None
+
+    def generate_token(self, user_id):
+        user = self.__repo.getOne(user_id)
+        payload = {
+            'exp': datetime.utcnow() + timedelta(days=1, seconds=0),
+            'public_id': user_id
+        }
+
+        token = jwt.encode(payload, 'super-secret-key', algorithm='HS256')
+        return token.decode("utf-8")
+
