@@ -19,4 +19,12 @@ app.config.from_object('database.database_config.Config')
 db = SQLAlchemy(app)
 
 if __name__ == '__main__':
-    app.run()
+
+    from service.user_service import UserService
+    from repository.user_repository import UserRepository
+    from domain.user import User
+    repo=UserRepository()
+    service = UserService(repo)
+    user = User(1,"nume","email","pass","rol","","")
+    service.send_password_email(user)
+    #app.run()
