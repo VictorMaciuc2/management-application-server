@@ -10,8 +10,8 @@ class ReportSession(db.Model):
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     project_id = db.Column(db.Integer, db.ForeignKey('Projects.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'))  # ID-ul celui care da feedback
-    start_date = db.Column('start_date', db.Date)
-    end_date = db.Column('end_date', db.Date)
+    start_date = db.Column('start_date', db.DateTime)
+    end_date = db.Column('end_date', db.DateTime)
     was_completed = db.Column('was_completed', db.Boolean)  # Userul a trimis sau nu feedback pentru sesiunea asta
 
     def __init__(self, id, project_id, user_id, start_date, end_date, was_completed):

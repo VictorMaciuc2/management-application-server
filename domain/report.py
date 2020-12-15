@@ -10,7 +10,7 @@ class Report(db.Model):
     skill_id = db.Column(db.Integer, db.ForeignKey('Skills.id'))  # Skill-ul pentru care s-a facut report
     project_id = db.Column(db.Integer, db.ForeignKey('Projects.id'))  # Proiectul in cadrul caruia s-a primit feedback
     mark = db.Column('mark', db.Integer)
-    date = db.Column('date', db.Date)
+    date = db.Column('date', db.DateTime)
 
     def __init__(self, id, user_id, skill_id, project_id, mark, date):
         self.id = id
