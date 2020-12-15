@@ -2,22 +2,22 @@ from controller import db
 
 
 class Skill(db.Model):
-    __tablename__='Skills'
-    __id=db.Column('id', db.Integer, primary_key=True)
-    __name=db.Column('name', db.String)
+    __tablename__ = 'Skills'
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column('name', db.String)
 
-    def __init__(self,id,name):
-        self.__id=id
-        self.__name=name
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
 
     def set_id(self, value):
-        self.__id=value
+        self.id = value
 
     def set_name(self, value):
-        self.__name=value
+        self.name = value
 
     def get_id(self):
-        return self.__id
+        return self.id
 
     def get_name(self):
-        return self.__name
+        return self.name
