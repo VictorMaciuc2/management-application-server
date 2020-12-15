@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import jsonify, request
-
-from controller.helpers.authorize import auth_required
+from domain.enums.role import Role
+from controller.helpers.authorize import auth_required_with_role
 from controller.helpers.mapper import Mapper
 from repository.project_repository import ProjectRepository
 from repository.technology_repository import TechnologyRepository
@@ -24,7 +24,7 @@ __tech_users_path = '/users/technologies'
 
 
 @projects.route('/projects', methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def get_all_projects():
     project_id = request.args.get('projectid')
     if project_id is None:
@@ -42,7 +42,7 @@ def get_all_projects():
 
 
 @projects.route('/projects', methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def save_project():
     project = Mapper.get_instance().json_to_project(request.json)
     project_service.addProject(project)
@@ -50,7 +50,7 @@ def save_project():
 
 
 @projects.route('/projects', methods=['PUT'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def update_project():
     project = Mapper.get_instance().json_to_project(request.json)
     project_service.updateProject(project)
@@ -58,7 +58,7 @@ def update_project():
 
 
 @projects.route('/projects', methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def delete_project():
     project_id = request.args.get('projectid')
     project_service.removeProject(project_id)
@@ -66,7 +66,7 @@ def delete_project():
 
 
 @projects.route(__tech_path, methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def get_technologies():
     project_id = request.args.get('projectid')
     tech_id = request.args.get('techid')
@@ -87,7 +87,7 @@ def get_technologies():
 # O tehnologie nu poate exista daca nu e asignata la minimum 1 proiect
 # Daca nu exista deja, tehnologia e creata si adaugata
 @projects.route(__tech_path, methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def assign_techs():
     project_id = request.args.get('projectid')
     techs = Mapper.get_instance().json_to_technologies(request.json)
@@ -97,7 +97,7 @@ def assign_techs():
 
 
 @projects.route(__tech_path, methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def unassign_tech():
     project_id = request.args.get('projectid')
     tech_id = request.args.get('techid')
@@ -106,7 +106,7 @@ def unassign_tech():
 
 
 @projects.route(__users_path, methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def get_users():
     project_id = request.args.get('projectid')
     user_id = request.args.get('userid')
@@ -123,7 +123,7 @@ def get_users():
 
 
 @projects.route(__users_path, methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def assign_users():
     project_id = request.args.get('projectid')
     for user in request.json['users']:
@@ -132,7 +132,7 @@ def assign_users():
 
 
 @projects.route(__users_path, methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def unassign_user():
     project_id = request.args.get('projectid')
     user_id = request.args.get('userid')
@@ -140,6 +140,6 @@ def unassign_user():
     return jsonify(success=True)
 
 @projects.route(__tech_users_path, methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.scrum_master])
 def get_users_by_technology():
     return jsonify(project_service.get_technologies_and_users_with_recommandation())

@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import jsonify, request
-
-from controller.helpers.authorize import auth_required
+from domain.enums.role import Role
+from controller.helpers.authorize import auth_required_with_role
 from controller.helpers.mapper import Mapper
 from repository.department_repository import DepartmentRepository
 from service.department_service import DepartmentService
@@ -14,7 +14,7 @@ deps = Blueprint('deps',__name__)
 
 
 @deps.route('/departments', methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr])
 def get_departments():
     department_id = request.args.get('departmentid')
     if department_id is None:
@@ -28,7 +28,7 @@ def get_departments():
 
 
 @deps.route('/departments', methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr])
 def save_department():
     department = Mapper.get_instance().json_to_department(request.json)
     department_service.add(department)
@@ -36,7 +36,7 @@ def save_department():
 
 
 @deps.route('/departments', methods=['PUT'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr])
 def update_department():
     department = Mapper.get_instance().json_to_department(request.json)
     department_service.update(department)
@@ -44,7 +44,7 @@ def update_department():
 
 
 @deps.route('/departments', methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr])
 def delete_departments():
     department_id = request.args.get('departmentid')
     department_service.remove(department_id)

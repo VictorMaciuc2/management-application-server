@@ -2,8 +2,8 @@ import json
 
 from flask import Blueprint
 from flask import jsonify, request
-
-from controller.helpers.authorize import auth_required
+from domain.enums.role import Role
+from controller.helpers.authorize import auth_required_with_role
 from controller.helpers.mapper import Mapper
 from repository.department_repository import DepartmentRepository
 from repository.user_repository import UserRepository
@@ -29,12 +29,13 @@ def login_post():
         return json.dumps(user)
 
     jsonUser = Mapper.get_instance().user_to_json(user)
+    #print(jsonUser)
     jsonUser['jwtToken'] = userService.generate_token(user.id)
     return jsonify(jsonUser)
 
 
 @users.route('/users', methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr,Role.scrum_master,Role.employee])
 def get_users():
     user_id = request.args.get('userid')
     if user_id is None:
@@ -50,7 +51,7 @@ def get_users():
 
 
 @users.route('/users', methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr,Role.scrum_master])
 def save_user():
     user = Mapper.get_instance().json_to_user(request.json)
     user_service.send_password_email(user) # old, plain text password is used to send it as an email to the user
@@ -61,7 +62,7 @@ def save_user():
 
 
 @users.route('/users', methods=['PUT'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr,Role.scrum_master])
 def update_user():
     user = Mapper.get_instance().json_to_user(request.json)
     user_service.update(user)
@@ -70,7 +71,7 @@ def update_user():
 
 
 @users.route('/users', methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator,Role.hr,Role.scrum_master])
 def delete_users():
     user_id = request.args.get('userid')
     user_service.remove(user_id)
