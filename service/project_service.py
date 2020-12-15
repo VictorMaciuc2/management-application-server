@@ -1,6 +1,6 @@
 from datetime import datetime, date, timedelta
 
-from controller.mapper import Mapper
+from controller.helpers.mapper import Mapper
 
 
 class ProjectService:
