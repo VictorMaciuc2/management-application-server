@@ -23,8 +23,8 @@ class UserService:
 
     def add(self, user):
         userfound = self.__repo.getOne(user.get_id())
-        if (userfound != None):
-            raise ValueError("Already exists a user with given id")
+        if userfound is not None:
+            raise ValueError("A user with the given ID already exists.")
         return self.__repo.add(user)
 
     def getAll(self):
@@ -33,14 +33,14 @@ class UserService:
 
     def getOne(self, id):
         user = self.__repo.getOne(id)
-        if (user == None):
-            raise ValueError("User with given id does not exist.")
+        if user is None:
+            raise ValueError("The user with the given ID does not exist.")
         return user
 
     def remove(self, id):
         user = self.__repo.getOne(id)
-        if (user == None):
-            raise ValueError("User with given id does not exist.")
+        if user is None:
+            raise ValueError("The user with the given ID does not exist.")
         from controller.project_controller import project_service
         for project in project_service.getProjectsForUser(user.get_id()):
             project_service.unassignUserFromProject(project.get_id(), user.get_id())
@@ -48,8 +48,8 @@ class UserService:
 
     def update(self, user):
         userfound = self.__repo.getOne(user.get_id())
-        if (userfound == None):
-            raise ValueError("User with given id does not exist.")
+        if userfound is None:
+            raise ValueError("The user with the given ID does not exist.")
 
         self.__repo.update(user)
 
@@ -91,4 +91,3 @@ class UserService:
 
         token = jwt.encode(payload, 'super-secret-key', algorithm='HS256')
         return token.decode("utf-8")
-
