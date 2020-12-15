@@ -28,7 +28,7 @@ def login_post():
     if user is None:
         return json.dumps(user)
 
-    jsonUser = Mapper.get_instance().user_to_json(user, department_service.getOne(user.department_id))
+    jsonUser = Mapper.get_instance().user_to_json(user)
     jsonUser['jwtToken'] = userService.generate_token(user.id)
     return jsonify(jsonUser)
 
@@ -41,12 +41,12 @@ def get_users():
         # get all users
         users = []
         for user in user_service.getAll():
-            users.append(Mapper.get_instance().user_to_json(user, department_service.getOne(user.department_id)))
+            users.append(Mapper.get_instance().user_to_json(user))
         return jsonify(users)
     else:
         # get one user
         user = user_service.getOne(user_id)
-        return Mapper.get_instance().user_to_json(user, department_service.getOne(user.department_id))
+        return Mapper.get_instance().user_to_json(user)
 
 
 @users.route('/users', methods=['POST'])
