@@ -86,7 +86,8 @@ class UserService:
         user = self.__repo.getOne(user_id)
         payload = {
             'exp': datetime.utcnow() + timedelta(days=1, seconds=0),
-            'public_id': user_id
+            'public_id': user_id,
+            'role': user.role
         }
 
         token = jwt.encode(payload, 'super-secret-key', algorithm='HS256')

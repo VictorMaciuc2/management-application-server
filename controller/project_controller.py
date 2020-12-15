@@ -28,7 +28,15 @@ __tech_users_path = '/users/technologies'
 def get_all_projects():
     project_id = request.args.get('projectid')
     if project_id is None:
-        return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getAllProjects()])
+        projects_list = []
+
+        for project in project_service.getAllProjects():
+            employees = [Mapper.get_instance().user_to_json(x) for x in project_service.getUsersForProject(project.id)]
+            technologies = [Mapper.get_instance().technology_to_json(x) for x in project_service.getTechnologiesForProject(project.id)]
+            client = Mapper.get_instance().client_to_json(client_service.getOne(project.client_id))
+            projects_list.append(Mapper.get_instance().project_to_json(project, employees, technologies, client))
+
+        return jsonify(projects_list)
     else:
         try:
             return Mapper.get_instance().project_to_json(project_service.getOneProject(project_id))
@@ -133,7 +141,7 @@ def get_users():
         if project_id is not None:
             users = project_service.getUsersForProject(project_id)
             return jsonify(
-                [Mapper.get_instance().user_to_json(x, department_service.getOne(x.get_department_id())) for x in users])
+                 [Mapper.get_instance().user_to_json(x, Mapper.get_instance().department_to_json(department_service.getOne(x.get_department_id()))) for x in users])
     except ValueError as err:
         return Response(err, 400)
 
