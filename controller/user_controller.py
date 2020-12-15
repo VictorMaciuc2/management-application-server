@@ -23,7 +23,6 @@ def login_post():
     user = userService.matchUserPassword(Mapper.get_instance().json_to_user(request.json))
     if user is None:
         return json.dumps(user)
-
     return Mapper.get_instance().user_to_json(user)
 
 
