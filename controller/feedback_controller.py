@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from flask import jsonify, request
 
 from controller.helpers.authorize import auth_required
@@ -33,18 +33,23 @@ def get_report_sessions():
             [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
              feedback_service.getAllReportSessions()])
 
-    if user_id is not None:
-        return jsonify(
-            [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
-             feedback_service.getAllReportSessionsForUser(user_id)])
+    try:
+        if user_id is not None:
+            return jsonify(
+                [Mapper.get_instance().report_session_to_json(x, project_service.getOneProject(x.get_project_id())) for x in
+                 feedback_service.getAllReportSessionsForUser(user_id)])
+    except ValueError as err:
+        return Response(err, 400)
 
-    if project_id is not None:
-        list = feedback_service.getAllReportSessionsForProject(project_id)
-        for x in list:
-            x['start_date'] = x['start_date'].strftime(Mapper.get_date_time_format())
-            x['end_date'] = x['end_date'].strftime(Mapper.get_date_time_format())
-        return jsonify(list)
-
+    try:
+        if project_id is not None:
+            list = feedback_service.getAllReportSessionsForProject(project_id)
+            for x in list:
+                x['start_date'] = x['start_date'].strftime(Mapper.get_date_time_format())
+                x['end_date'] = x['end_date'].strftime(Mapper.get_date_time_format())
+            return jsonify(list)
+    except ValueError as err:
+        return Response(err, 400)
 
 # Va deschide un report session pentru fiecare user membru al proiectului dat
 @feedback.route(__report_sessions_path, methods=['POST'])
@@ -53,7 +58,10 @@ def add_report_sessions():
     project_id = request.json['project_id']
     start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
     end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
-    count = feedback_service.addReportSessions(project_id, start_date, end_date)
+    try:
+        count = feedback_service.addReportSessions(project_id, start_date, end_date)
+    except ValueError as err:
+        return Response(err, 400)
     return jsonify(added=count)
 
 
@@ -64,7 +72,10 @@ def delete_report_sessions():
     project_id = request.json['project_id']
     start_date = Mapper.get_instance().json_to_date_time(request.json['start_date'])
     end_date = Mapper.get_instance().json_to_date_time(request.json['end_date'])
-    count = feedback_service.removeReportSessions(project_id, start_date, end_date)
+    try:
+        count = feedback_service.removeReportSessions(project_id, start_date, end_date)
+    except ValueError as err:
+        return Response(err, 400)
     return jsonify(removed=count)
 
 
@@ -73,6 +84,9 @@ def delete_report_sessions():
 def add_reports():
     from datetime import datetime
     report_session_id = request.args.get('sessionid')
-    count = feedback_service.addReports(report_session_id, Mapper.get_instance().json_to_reports(request.json),
-                                        datetime.now())
+    try:
+        count = feedback_service.addReports(report_session_id, Mapper.get_instance().json_to_reports(request.json),
+                datetime.now())
+    except ValueError as err:
+        return Response(err, 400)
     return jsonify(added=count)

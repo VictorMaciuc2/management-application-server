@@ -12,9 +12,14 @@ class FeedbackService:
         return self.__report_session_repo.getAll()
 
     def getAllReportSessionsForUser(self, userId):
+        from controller.user_controller import user_service
+        user_service.getOne(userId) # raises ValueError if user with userId does not exist
         return self.__report_session_repo.getAllForUser(userId)
 
     def getAllReportSessionsForProject(self, projectId):
+        from controller.project_controller import project_service
+        project_service.getOneProject(projectId) # raises ValueError if project with projectId does not exist
+
         rs = self.__report_session_repo.getAllForProject(projectId)
 
         dictionar = {}
@@ -41,11 +46,17 @@ class FeedbackService:
 
         count = 0
         for user in self.__project_service.getUsersForProject(projectId):
+            # raises ValueError if project with given ID
+            #  does not exist
             self.__report_session_repo.add(ReportSession(None, projectId, user.get_id(), startDate, endDate, False))
             count += 1
         return count
 
     def removeReportSessions(self, projectId, startDate, endDate):
+
+        from controller.project_controller import project_service
+        project_service.getOneProject(projectId)  # raises ValueError if project with projectId does not exist
+
         sessions = self.__report_session_repo.getAllForProject(projectId)
         count = 0
         for x in sessions:

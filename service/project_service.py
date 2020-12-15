@@ -48,6 +48,7 @@ class ProjectService:
 
     def assignTechToProject(self, projectId, tech):
         from domain.project_technology import Project_Technology
+        self.getOneProject(projectId) # raises ValueError if project with given ID does not exist
         try:
             self.__tech_service.getOne(tech.get_id())
         except ValueError:
@@ -85,17 +86,22 @@ class ProjectService:
         return self.__user_project_repo.getOne(userId, projectId) is not None
 
     def getUsersForProject(self, projectId):
+        self.getOneProject(projectId) # raises ValueError if project with given ID does not exist
+
         return [self.__user_service.getOne(x.get_user_id()) for x in self.__user_project_repo.getAllForProject(projectId)]
 
     def getTechnologiesForProject(self, projectId):
         return [self.__tech_service.getOne(x.get_technology_id()) for x in
                 self.__project_tech_repo.getAllForProject(projectId)]
+        # raises ValueError if project with given ID does not exist
 
     def getProjectsForUser(self, userId):
         return [self.getOneProject(x.get_project_id()) for x in self.__user_project_repo.getAllForUser(userId)]
+        # raises ValueError if project with given ID does not exist
 
     def getProjectsForTechnology(self, techId):
         return [self.getOneProject(x.get_project_id()) for x in self.__project_tech_repo.getAllForTechnology(techId)]
+        # raises ValueError if project with given ID does not exist
 
     def get_technologies_and_users_with_recommandation(self):
         technologies = []

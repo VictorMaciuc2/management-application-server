@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint
+from flask import Blueprint, Response
 from flask import jsonify, request
 
 from controller.helpers.authorize import auth_required
@@ -53,10 +53,13 @@ def get_users():
 @auth_required
 def save_user():
     user = Mapper.get_instance().json_to_user(request.json)
-    user_service.send_password_email(user) # old, plain text password is used to send it as an email to the user
-    user.set_password(generate_password_hash(user.get_password())) # method : "pbkdf2:sha256"
-    user_service.add(user)
-    user.set_department(department_service.getOne(user.department_id))
+    try:
+        user_service.send_password_email(user) # old, plain text password is used to send it as an email to the user
+        user.set_password(generate_password_hash(user.get_password())) # method : "pbkdf2:sha256"
+        user_service.add(user)
+        user.set_department(department_service.getOne(user.department_id))
+    except ValueError as err:
+        return Response(err, 400)
     return Mapper.get_instance().user_to_json(user)
 
 
@@ -64,8 +67,11 @@ def save_user():
 @auth_required
 def update_user():
     user = Mapper.get_instance().json_to_user(request.json)
-    user_service.update(user)
-    user.set_department(department_service.getOne(user.department_id))
+    try:
+        user_service.update(user)
+        user.set_department(department_service.getOne(user.department_id))
+    except ValueError as err:
+        return Response(err, 400)
     return Mapper.get_instance().user_to_json(user)
 
 
@@ -73,5 +79,8 @@ def update_user():
 @auth_required
 def delete_users():
     user_id = request.args.get('userid')
-    user_service.remove(user_id)
+    try:
+        user_service.remove(user_id)
+    except ValueError as err:
+        return Response(err, 400)
     return jsonify(success=True)
