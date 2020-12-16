@@ -3,8 +3,9 @@ import json
 from flask import Blueprint, Response
 from flask import jsonify, request
 
-from controller.helpers.authorize import auth_required
+from controller.helpers.authorize import auth_required_with_role
 from controller.helpers.mapper import Mapper
+from domain.enums.role import Role
 from repository.department_repository import DepartmentRepository
 from repository.user_repository import UserRepository
 from service.department_service import DepartmentService
@@ -34,14 +35,15 @@ def login_post():
 
 
 @users.route('/users', methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def get_users():
     user_id = request.args.get('userid')
     if user_id is None:
         # get all users
         users = []
         for user in user_service.getAll():
-            users.append(Mapper.get_instance().user_to_json(user))
+            department = Mapper.get_instance().department_to_json(department_service.getOne(user.department_id))
+            users.append(Mapper.get_instance().user_to_json(user, department))
         return jsonify(users)
     else:
         # get one user
@@ -53,7 +55,7 @@ def get_users():
 
 
 @users.route('/users', methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def save_user():
     user = Mapper.get_instance().json_to_user(request.json)
     try:
@@ -67,7 +69,7 @@ def save_user():
 
 
 @users.route('/users', methods=['PUT'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def update_user():
     user = Mapper.get_instance().json_to_user(request.json)
     try:
@@ -79,7 +81,7 @@ def update_user():
 
 
 @users.route('/users', methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def delete_users():
     user_id = request.args.get('userid')
     try:
