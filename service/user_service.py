@@ -44,6 +44,10 @@ class UserService:
         from controller.project_controller import project_service
         for project in project_service.getProjectsForUser(user.get_id()):
             project_service.unassignUserFromProject(project.get_id(), user.get_id())
+
+        from controller.feedback_controller import feedback_service
+        feedback_service.forceDeleteFeedbackDataForUser(user.get_id())
+        
         self.__repo.remove(user)
 
     def update(self, user):
