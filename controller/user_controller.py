@@ -45,8 +45,11 @@ def get_users():
         return jsonify(users)
     else:
         # get one user
-        user = user_service.getOne(user_id)
-        return Mapper.get_instance().user_to_json(user)
+        try:
+            user = user_service.getOne(user_id)
+            return Mapper.get_instance().user_to_json(user)
+        except ValueError as err:
+            return Response(str(err), 400)
 
 
 @users.route('/users', methods=['POST'])
@@ -59,7 +62,7 @@ def save_user():
         user_service.add(user)
         user.set_department(department_service.getOne(user.department_id))
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().user_to_json(user)
 
 
@@ -71,7 +74,7 @@ def update_user():
         user_service.update(user)
         user.set_department(department_service.getOne(user.department_id))
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().user_to_json(user)
 
 
@@ -82,5 +85,5 @@ def delete_users():
     try:
         user_service.remove(user_id)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return jsonify(success=True)

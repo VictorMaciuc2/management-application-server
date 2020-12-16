@@ -26,7 +26,7 @@ def get_departments():
         try:
             department = department_service.getOne(department_id)
         except ValueError as err:
-            return Response(err, 400)
+            return Response(str(err), 400)
         return Mapper.get_instance().client_to_json(department)
 
 
@@ -37,7 +37,7 @@ def save_department():
     try:
         department_service.add(department)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().department_to_json(department)
 
 
@@ -48,7 +48,7 @@ def update_department():
     try:
         department_service.update(department)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().department_to_json(department)
 
 
@@ -59,5 +59,5 @@ def delete_departments():
     try:
         department_service.remove(department_id)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return jsonify(success=True)

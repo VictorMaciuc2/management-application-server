@@ -24,7 +24,7 @@ def get_clients():
         try:
             client = client_service.getOne(client_id)
         except ValueError as err:
-            return Response(err, 400)
+            return Response(str(err), 400)
         return Mapper.get_instance().client_to_json(client)
 
 
@@ -35,7 +35,7 @@ def save_client():
     try:
         client_service.add(client)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().client_to_json(client)
 
 
@@ -46,7 +46,7 @@ def update_client():
     try:
         client_service.update(client)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return Mapper.get_instance().client_to_json(client)
 
 
@@ -57,5 +57,5 @@ def delete_clients():
     try:
         client_service.remove(client_id)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return jsonify(success=True)
