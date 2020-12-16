@@ -42,7 +42,8 @@ def get_users():
         # get all users
         users = []
         for user in user_service.getAll():
-            users.append(Mapper.get_instance().user_to_json(user))
+            departemnt = Mapper.get_instance().department_to_json(department_service.getOne(user.department_id))
+            users.append(Mapper.get_instance().user_to_json(user, departemnt))
         return jsonify(users)
     else:
         # get one user
