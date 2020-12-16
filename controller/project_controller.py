@@ -131,7 +131,7 @@ def unassign_tech():
 
 
 @projects.route(__users_path, methods=['GET'])
-@auth_required_with_role([Role.administrator, Role.scrum_master])
+@auth_required_with_role([Role.administrator, Role.scrum_master, Role.employee])
 def get_users():
     project_id = request.args.get('projectid')
     user_id = request.args.get('userid')

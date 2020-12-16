@@ -108,8 +108,8 @@ class Mapper:
 
     def report_session_to_json(self, rs, project):
         return {'id': rs.get_id(),
-                'start_date': rs.get_start_date().strftime(Mapper.__date_time_format),
-                'end_date': rs.get_end_date().strftime(Mapper.__date_time_format),
+                'start_date': rs.get_start_date().strftime(Mapper.__date_format),
+                'end_date': rs.get_end_date().strftime(Mapper.__date_format),
                 'was_completed': rs.get_was_completed(), 'user_id': rs.get_user_id(),
                 'project': self.project_to_json(project)
         }
