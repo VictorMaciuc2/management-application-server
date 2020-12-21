@@ -77,7 +77,7 @@ class Mapper:
                                                       'description': department.description}
 
 
-    def user_to_json(self, user, department=None):
+    def user_to_json(self, user, department=None,nrofprojects=None):
         return user if user is None else {
             'id': user.id,
             'email': user.email,
@@ -85,7 +85,8 @@ class Mapper:
             'role': user.role,
             'seniorityLevel': user.seniority_level,
             'departmentId': user.department_id,
-            'department': department
+            'department': department,
+            'nrOfProjects' : nrofprojects
         }
 
     def project_to_json(self, project, employees=None, technologies=None, client=None):
