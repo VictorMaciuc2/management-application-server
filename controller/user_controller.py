@@ -3,8 +3,9 @@ import json
 from flask import Blueprint, Response
 from flask import jsonify, request
 
-from controller.helpers.authorize import auth_required
+from controller.helpers.authorize import auth_required_with_role
 from controller.helpers.mapper import Mapper
+from domain.enums.role import Role
 from repository.department_repository import DepartmentRepository
 from repository.user_repository import UserRepository
 from service.department_service import DepartmentService
@@ -34,53 +35,58 @@ def login_post():
 
 
 @users.route('/users', methods=['GET'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def get_users():
     user_id = request.args.get('userid')
     if user_id is None:
         # get all users
         users = []
         for user in user_service.getAll():
-            users.append(Mapper.get_instance().user_to_json(user))
+            department = Mapper.get_instance().department_to_json(department_service.getOne(user.department_id))
+            users.append(Mapper.get_instance().user_to_json(user, department))
         return jsonify(users)
     else:
         # get one user
-        user = user_service.getOne(user_id)
-        return Mapper.get_instance().user_to_json(user)
+        try:
+            user = user_service.getOne(user_id)
+            return Mapper.get_instance().user_to_json(user)
+        except ValueError as err:
+            return Response(str(err), 400)
 
 
 @users.route('/users', methods=['POST'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def save_user():
     user = Mapper.get_instance().json_to_user(request.json)
     try:
         user_service.send_password_email(user) # old, plain text password is used to send it as an email to the user
+        print(user.get_password())
         user.set_password(generate_password_hash(user.get_password())) # method : "pbkdf2:sha256"
         user_service.add(user)
-        user.set_department(department_service.getOne(user.department_id))
+        department = Mapper.get_instance().department_to_json(department_service.getOne(user.department_id))
     except ValueError as err:
-        return Response(err, 400)
-    return Mapper.get_instance().user_to_json(user)
+        return Response(str(err), 400)
+    return Mapper.get_instance().user_to_json(user, department)
 
 
 @users.route('/users', methods=['PUT'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def update_user():
     user = Mapper.get_instance().json_to_user(request.json)
     try:
         user_service.update(user)
-        user.set_department(department_service.getOne(user.department_id))
+        department = Mapper.get_instance().department_to_json(department_service.getOne(user.department_id))
     except ValueError as err:
-        return Response(err, 400)
-    return Mapper.get_instance().user_to_json(user)
+        return Response(str(err), 400)
+    return Mapper.get_instance().user_to_json(user, department)
 
 
 @users.route('/users', methods=['DELETE'])
-@auth_required
+@auth_required_with_role([Role.administrator, Role.hr])
 def delete_users():
     user_id = request.args.get('userid')
     try:
         user_service.remove(user_id)
     except ValueError as err:
-        return Response(err, 400)
+        return Response(str(err), 400)
     return jsonify(success=True)
