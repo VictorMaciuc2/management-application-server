@@ -16,8 +16,8 @@ class UserService:
 
     def matchUserPassword(self, email, password):
         addedUser = self.__repo.findByEmail(email)
-        if not addedUser or addedUser.get_password() != password:
-            # TODO: Skip for now: (check_password_hash(addedUser.get_password(), password) is False):  # verify hash
+        print(addedUser.get_password(), password)
+        if not addedUser or check_password_hash(addedUser.get_password(), password) is False:
             return None  # if the user doesn't exist or password is wrong, return null
         return addedUser
 

@@ -35,7 +35,6 @@ class UserRepository:
         userfound = User.query.get(user.get_id())
         userfound.set_name(user.get_name())
         userfound.set_email(user.get_email())
-        userfound.set_password(user.get_password())
         userfound.set_role(user.get_role())
         userfound.set_seniority_level(user.get_seniority_level())
         userfound.set_department_id(user.get_department_id())
