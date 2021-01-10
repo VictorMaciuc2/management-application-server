@@ -31,11 +31,11 @@ class Mapper:
 
     def json_to_client(self, json):
         from domain.client import Client
-        return json if json is None else Client(json['id'], json['name'], json['description'])
+        return json if json is None else Client(json['id'], json['name'], "" if json['description'] is None else json['description'])
 
     def json_to_department(self, json):
         from domain.department import Department
-        return json if json is None else Department(json['id'], json['name'], json['description'])
+        return json if json is None else Department(json['id'], json['name'], "" if json['description'] is None else json['description'])
 
     def json_to_user(self, json):
         from domain.user import User
@@ -46,13 +46,12 @@ class Mapper:
 
     def json_to_project(self, json):
         from domain.project import Project
+        return json if json is None else Project(json['id'], json['name'],
+                       "" if json['description'] is None else json['description'],
+                       datetime.strptime(json['startDate'], Mapper.__date_format),
+                       None if json['endDate'] is None else datetime.strptime(json['endDate'], Mapper.__date_format),
+                       datetime.strptime(json['deadlineDate'], Mapper.__date_format), json['clientId'])
 
-        return json if json is None else \
-            Project(json['id'], json['name'], json['description'],
-                    datetime.strptime(json['startDate'], Mapper.__date_format),
-                    None if json['endDate'] is None else datetime.strptime(json['endDate'],Mapper.__date_format),
-                    datetime.strptime(json['deadlineDate'], Mapper.__date_format),
-                    json['clientId'])
 
     def json_to_technologies(self, json):
         from domain.technology import Technology
@@ -76,6 +75,7 @@ class Mapper:
     def department_to_json(self, department):
         return department if department is None else {'id': department.id, 'name': department.name,
                                                       'description': department.description}
+
 
     def user_to_json(self, user, department=None):
         return user if user is None else {
@@ -102,13 +102,14 @@ class Mapper:
             'client': client
         }
 
+
     def technology_to_json(self, tech):
         return {'id': tech.get_id(), 'name': tech.get_name()}
 
     def report_session_to_json(self, rs, project):
         return {'id': rs.get_id(),
-                'start_date': rs.get_start_date().strftime(Mapper.__date_time_format),
-                'end_date': rs.get_end_date().strftime(Mapper.__date_time_format),
+                'start_date': rs.get_start_date().strftime(Mapper.__date_format),
+                'end_date': rs.get_end_date().strftime(Mapper.__date_format),
                 'was_completed': rs.get_was_completed(), 'user_id': rs.get_user_id(),
                 'project': self.project_to_json(project)
         }

@@ -1,4 +1,6 @@
 from enum import Enum
+
+
 class Role(Enum):
     administrator = 0
     hr = 1

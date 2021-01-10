@@ -4,7 +4,8 @@ from controller.helpers.mapper import Mapper
 
 
 class ProjectService:
-    def __init__(self, __repo, project_technology_repo, user_project_repo, technology_service, user_service, client_service):
+    def __init__(self, __repo, project_technology_repo, user_project_repo, technology_service, user_service,
+                 client_service):
         self.__project_repo = __repo
         self.__project_tech_repo = project_technology_repo
         self.__user_project_repo = user_project_repo
@@ -32,10 +33,14 @@ class ProjectService:
         project = self.__project_repo.getOne(id)
         if project is None:
             raise ValueError("The project with the given ID does not exist.")
-        for x in self.getTechnologiesForProject(id):
-            self.unassignTechFromProject(id, x.get_id())
-        for x in self.getUsersForProject(id):
-            self.unassignUserFromProject(id, x.get_id())
+        for x in self.getTechnologiesForProject(project.get_id()):
+            self.unassignTechFromProject(project.get_id(), x.get_id())
+        for x in self.getUsersForProject(project.get_id()):
+            self.unassignUserFromProject(project.get_id(), x.get_id())
+
+        from controller.feedback_controller import feedback_service
+        feedback_service.forceDeleteFeedbackDataForProject(project.get_id())
+
         self.__project_repo.remove(project)
 
     def updateProject(self, project):
@@ -48,6 +53,7 @@ class ProjectService:
 
     def assignTechToProject(self, projectId, tech):
         from domain.project_technology import Project_Technology
+        self.getOneProject(projectId)  # raises ValueError if project with given ID does not exist
         try:
             self.__tech_service.getOne(tech.get_id())
         except ValueError:
@@ -85,17 +91,23 @@ class ProjectService:
         return self.__user_project_repo.getOne(userId, projectId) is not None
 
     def getUsersForProject(self, projectId):
-        return [self.__user_service.getOne(x.get_user_id()) for x in self.__user_project_repo.getAllForProject(projectId)]
+        self.getOneProject(projectId)  # raises ValueError if project with given ID does not exist
+
+        return [self.__user_service.getOne(x.get_user_id()) for x in
+                self.__user_project_repo.getAllForProject(projectId)]
 
     def getTechnologiesForProject(self, projectId):
         return [self.__tech_service.getOne(x.get_technology_id()) for x in
                 self.__project_tech_repo.getAllForProject(projectId)]
+        # raises ValueError if project with given ID does not exist
 
     def getProjectsForUser(self, userId):
         return [self.getOneProject(x.get_project_id()) for x in self.__user_project_repo.getAllForUser(userId)]
+        # raises ValueError if project with given ID does not exist
 
     def getProjectsForTechnology(self, techId):
         return [self.getOneProject(x.get_project_id()) for x in self.__project_tech_repo.getAllForTechnology(techId)]
+        # raises ValueError if project with given ID does not exist
 
     def get_technologies_and_users_with_recommandation(self):
         technologies = []
@@ -108,7 +120,8 @@ class ProjectService:
                     project = self.__project_repo.getOne(user_project.project_id)
                     project_technology = self.__project_tech_repo.getOne(project.id, technology['id'])
                     if project_technology is not None:
-                        difference = (datetime.now().date() if project.end_date is None else project.end_date) - project.start_date
+                        difference = (
+                                         datetime.now().date() if project.end_date is None else project.end_date) - project.start_date
                         experience_in_days += difference.days
 
                 technology['users'].append({
@@ -120,4 +133,3 @@ class ProjectService:
             technologies.append(technology)
 
         return technologies
-
