@@ -106,6 +106,17 @@ class FeedbackService:
         self.__report_session_repo.update(session)
         return count
 
+    def getSkillAverage(self, skillId, userId):
+        count = 0
+        total = 0
+        for report in self.__report_repo.getAllForUserAndSkill(userId, skillId):
+            count = count + 1
+            total = total + report.get_mark()
+
+        if count == 0:
+            return 0
+        return total/count
+
     # Deletes all reports report sessions, regardless of completed or not. Used when deleting projects
     def forceDeleteFeedbackDataForProject(self, projectId):
         sessions = self.__report_session_repo.getAllForProject(projectId)
