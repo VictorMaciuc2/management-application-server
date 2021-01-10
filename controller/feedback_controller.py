@@ -111,3 +111,16 @@ def get_users_based_on_skill():
         result.append({'skill': Mapper.get_instance().skill_to_json(skill), 'users': skillRes})
 
     return jsonify(result)
+
+
+@feedback.route(__skills_path + '/growth', methods=['GET'])
+@auth_required_with_role([Role.administrator, Role.scrum_master])
+def get_user_growth():
+    users = user_service.getAll()
+
+    result = []
+    for user in users:
+        result.append({'user': Mapper.get_instance().user_to_json(user),
+                       'reports': feedback_service.getRatingGrowth(user.get_id())})
+
+    return jsonify(result)

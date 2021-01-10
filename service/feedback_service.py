@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+
 class FeedbackService:
     def __init__(self, report_repo, report_session_repo, skills_repo, project_service):
         self.__report_repo = report_repo
@@ -13,12 +16,12 @@ class FeedbackService:
 
     def getAllReportSessionsForUser(self, userId):
         from controller.user_controller import user_service
-        user_service.getOne(userId) # raises ValueError if user with userId does not exist
+        user_service.getOne(userId)  # raises ValueError if user with userId does not exist
         return self.__report_session_repo.getAllForUser(userId)
 
     def getAllReportSessionsForProject(self, projectId):
         from controller.project_controller import project_service
-        project_service.getOneProject(projectId) # raises ValueError if project with projectId does not exist
+        project_service.getOneProject(projectId)  # raises ValueError if project with projectId does not exist
 
         rs = self.__report_session_repo.getAllForProject(projectId)
 
@@ -115,7 +118,25 @@ class FeedbackService:
 
         if count == 0:
             return 0
-        return total/count
+        return total / count
+
+    def getRatingGrowth(self, userId):
+        ratings = {}
+        for rep in self.__report_repo.getAllForUser(userId):
+            weekStartDay = rep.get_date() - timedelta(days=rep.get_date().weekday())
+            if weekStartDay not in ratings:
+                ratings[weekStartDay] = (1, rep.get_mark())
+            else:
+                count = ratings[weekStartDay][0]
+                val = ratings[weekStartDay][1]
+                ratings[weekStartDay] = ((count + 1), (val + rep.get_mark()))
+
+        from controller.helpers.mapper import Mapper
+        result = []
+        for weekStartDay in ratings:
+            result.append({'date': weekStartDay.strftime(Mapper.get_date_format()),
+                           'rating': ratings[weekStartDay][1] / ratings[weekStartDay][0]})
+        return result
 
     # Deletes all reports report sessions, regardless of completed or not. Used when deleting projects
     def forceDeleteFeedbackDataForProject(self, projectId):
