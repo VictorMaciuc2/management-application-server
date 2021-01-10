@@ -2,6 +2,7 @@ class TechnologyService:
     def __init__(self, __repo):
         self.__repo = __repo
 
+
     def getAll(self):
         return self.__repo.getAll()
 
@@ -28,3 +29,5 @@ class TechnologyService:
         if tech is None:
             raise ValueError("The technology with the given ID does not exist.")
         return self.__repo.update(technology)
+    def getMostUsedTechnologies(self):
+        return self.__repo.getMostUsedTechnologies()
