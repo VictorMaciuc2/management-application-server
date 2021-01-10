@@ -1,3 +1,5 @@
+import datetime
+
 from flask import Blueprint, Response
 from flask import jsonify, request
 
@@ -33,7 +35,8 @@ def get_all_projects():
 
         for project in project_service.getAllProjects():
             employees = [Mapper.get_instance().user_to_json(x) for x in project_service.getUsersForProject(project.id)]
-            technologies = [Mapper.get_instance().technology_to_json(x) for x in project_service.getTechnologiesForProject(project.id)]
+            technologies = [Mapper.get_instance().technology_to_json(x) for x in
+                            project_service.getTechnologiesForProject(project.id)]
             client = Mapper.get_instance().client_to_json(client_service.getOne(project.client_id))
             projects_list.append(Mapper.get_instance().project_to_json(project, employees, technologies, client))
 
@@ -98,7 +101,7 @@ def get_technologies():
         try:
             return Mapper.get_instance().technology_to_json(technology_service.getOne(tech_id))
         except ValueError as err:
-          return Response(str(err), 400)
+            return Response(str(err), 400)
 
     return jsonify(assigned=project_service.isTechAssignedToProject(project_id, tech_id))
 
@@ -142,13 +145,15 @@ def get_users():
         try:
             users = project_service.getUsersForProject(project_id)
             return jsonify(
-                 [Mapper.get_instance().user_to_json(x, Mapper.get_instance().department_to_json(department_service.getOne(x.get_department_id()))) for x in users])
+                [Mapper.get_instance().user_to_json(x, Mapper.get_instance().department_to_json(
+                    department_service.getOne(x.get_department_id()))) for x in users])
         except ValueError as err:
             return Response(str(err), 400)
 
     if user_id is not None:
         try:
-            return jsonify([Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])
+            return jsonify(
+                [Mapper.get_instance().project_to_json(x) for x in project_service.getProjectsForUser(user_id)])
         except ValueError as err:
             return Response(str(err), 400)
 
@@ -159,9 +164,9 @@ def get_users_and_nr_of_projects():
     list = []
     for user in user_service.getAll():
         nrOfProjectsForCurrentUser = len(project_service.getProjectsForUser(user.get_id()))
-        list.append([user,nrOfProjectsForCurrentUser])
+        list.append([user, nrOfProjectsForCurrentUser])
     try:
-        return jsonify([Mapper.get_instance().user_to_json(x[0],nrofprojects=x[1]) for x in list])
+        return jsonify([Mapper.get_instance().user_to_json(x[0], nrofprojects=x[1]) for x in list])
     except ValueError as err:
         return Response(str(err), 400)
 
@@ -196,13 +201,32 @@ def get_users_by_technology():
     return jsonify(project_service.get_technologies_and_users_with_recommandation())
 
 
-#TODO Change hardcoded route and enable auth
+# TODO Change hardcoded route and enable auth
 @projects.route('/tp', methods=['GET'])
-#@auth_required_with_role([Role.administrator, Role.scrum_master])
+# @auth_required_with_role([Role.administrator, Role.scrum_master])
 def get_most_used_technologies():
-    rez={}
-    for i,el in enumerate(technology_service.getMostUsedTechnologies()):
-        tech_json_with_nrproj=Mapper.get_instance().technology_to_json(el[0])
-        tech_json_with_nrproj['nr_of_projects']=el[1]
-        rez[i]=tech_json_with_nrproj
+    rez = {}
+    for i, el in enumerate(technology_service.getMostUsedTechnologies()):
+        tech_json_with_nrproj = Mapper.get_instance().technology_to_json(el[0])
+        tech_json_with_nrproj['nr_of_projects'] = el[1]
+        rez[i] = tech_json_with_nrproj
     return jsonify(rez)
+
+
+@projects.route('/projects/progress', methods=['GET'])
+@auth_required_with_role([Role.administrator, Role.scrum_master])
+def get_project_progress():
+    projects_list = []
+
+    for project in project_service.getAllProjects():
+        if project.get_start_date() > datetime.date.today() or (project.get_end_date() is not None and not (
+                project.get_start_date() < datetime.date.today() < project.get_end_date())):
+            continue
+
+        total = project.get_deadline_date() - project.get_start_date()
+        progres = min(datetime.date.today(), project.get_deadline_date()) - project.get_start_date()
+
+        projects_list.append(
+            {'project': Mapper.get_instance().project_to_json(project), 'procent': (progres / total * 100)})
+
+    return jsonify(projects_list)
