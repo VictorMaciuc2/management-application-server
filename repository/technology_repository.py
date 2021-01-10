@@ -30,3 +30,18 @@ class TechnologyRepository:
         techFound.set_name(tech.get_name())
         db.session.commit()
         return tech
+
+    def getMostUsedTechnologies(self):
+        #from controller import db
+        from sqlalchemy import func
+
+        from domain.project_technology import Project_Technology
+        from domain.technology import Technology, db
+        rez=db.session.query(Technology,func.count(Project_Technology.technology_id))\
+            .select_from(Project_Technology)\
+            .filter(Technology.id == Project_Technology.technology_id)\
+            .group_by(Technology)\
+            .all()
+        maxi=max(el[1] for el in rez)
+        rez=[el for el in rez if el[1]==maxi]
+        return rez
