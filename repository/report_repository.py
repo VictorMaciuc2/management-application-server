@@ -7,6 +7,10 @@ class ReportRepository:
         from domain.report import Report
         return Report.query.filter(Report.user_id == userId).all()
 
+    def getAllForUserAndSkill(self, userId, skillId):
+        from domain.report import Report
+        return Report.query.filter(Report.user_id == userId and Report.skill_id == skillId).all()
+
     def getAllForProject(self, projectId):
         from domain.report import Report
         return Report.query.filter(Report.project_id == projectId).all()

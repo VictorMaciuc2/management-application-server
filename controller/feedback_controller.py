@@ -9,6 +9,7 @@ from repository.report_session_repository import ReportSessionRepository
 from repository.skill_repository import SkillRepository
 from service.feedback_service import FeedbackService
 from controller.project_controller import project_service
+from controller.user_controller import user_service
 
 feedback_service = FeedbackService(ReportRepository(), ReportSessionRepository(), SkillRepository(), project_service)
 
@@ -93,3 +94,33 @@ def add_reports():
     except ValueError as err:
         return Response(str(err), 400)
     return jsonify(added=count)
+
+
+@feedback.route(__skills_path + '/users', methods=['GET'])
+@auth_required_with_role([Role.administrator, Role.scrum_master])
+def get_users_based_on_skill():
+    skills = feedback_service.getAllSkills()
+    users = user_service.getAll()
+
+    result = []
+    for skill in skills:
+        skillRes = []
+        for user in users:
+            skillRes.append({'user': Mapper.get_instance().user_to_json(user),
+                             'rating': feedback_service.getSkillAverage(skill.get_id(), user.get_id())})
+        result.append({'skill': Mapper.get_instance().skill_to_json(skill), 'users': skillRes})
+
+    return jsonify(result)
+
+
+@feedback.route(__skills_path + '/growth', methods=['GET'])
+@auth_required_with_role([Role.administrator, Role.scrum_master])
+def get_user_growth():
+    users = user_service.getAll()
+
+    result = []
+    for user in users:
+        result.append({'user': Mapper.get_instance().user_to_json(user),
+                       'reports': feedback_service.getRatingGrowth(user.get_id())})
+
+    return jsonify(result)
