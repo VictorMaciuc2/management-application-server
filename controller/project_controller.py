@@ -153,6 +153,19 @@ def get_users():
             return Response(str(err), 400)
 
 
+@projects.route("/projects/userslist", methods=['GET'])
+@auth_required_with_role([Role.administrator, Role.scrum_master])
+def get_users_and_nr_of_projects():
+    list = []
+    for user in user_service.getAll():
+        nrOfProjectsForCurrentUser = len(project_service.getProjectsForUser(user.get_id()))
+        list.append([user,nrOfProjectsForCurrentUser])
+    try:
+        return jsonify([Mapper.get_instance().user_to_json(x[0],nrofprojects=x[1]) for x in list])
+    except ValueError as err:
+        return Response(str(err), 400)
+
+
 @projects.route(__users_path, methods=['POST'])
 @auth_required_with_role([Role.administrator, Role.scrum_master])
 def assign_users():
