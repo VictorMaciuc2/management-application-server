@@ -24,6 +24,7 @@ projects = Blueprint('projects', __name__)
 __tech_path = '/projects/technologies'
 __users_path = '/projects/users'
 __tech_users_path = '/users/technologies'
+__most_used_techs='/projects/mosttechs'
 
 
 @projects.route('/projects', methods=['GET'])
@@ -201,9 +202,8 @@ def get_users_by_technology():
     return jsonify(project_service.get_technologies_and_users_with_recommandation())
 
 
-# TODO Change hardcoded route and enable auth
-@projects.route('/tp', methods=['GET'])
-# @auth_required_with_role([Role.administrator, Role.scrum_master])
+@projects.route(__most_used_techs, methods=['GET'])
+@auth_required_with_role([Role.administrator, Role.scrum_master])
 def get_most_used_technologies():
     rez = {}
     for i, el in enumerate(technology_service.getMostUsedTechnologies()):
