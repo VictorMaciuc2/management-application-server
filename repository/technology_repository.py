@@ -42,6 +42,6 @@ class TechnologyRepository:
             .filter(Technology.id == Project_Technology.technology_id)\
             .group_by(Technology)\
             .all()
-        maxi=max(el[1] for el in rez)
-        rez=[el for el in rez if el[1]==maxi]
+        #maxi=max(el[1] for el in rez)
+        #rez=[el for el in rez if el[1]==maxi]
         return rez

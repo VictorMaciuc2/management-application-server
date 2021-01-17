@@ -87,17 +87,13 @@ class FeedbackService:
         for report in reports:
             if report.get_user_id() == session.get_user_id():  # Nu isi poate da feedback singur
                 continue
-
-            if not self.__project_service.isUserAssignedToProject(report.get_user_id(), session.get_project_id()):
+            if not self.__project_service.isUserAssignedToProject(session.get_project_id(), report.get_user_id()):
                 continue
-
             if self.__skills_repo.getOne(report.get_skill_id()) is None:
                 continue
-
             tup = (report.get_user_id(), report.get_skill_id())
             if tup in check:
                 continue
-
             check.append(tup)
 
             report.set_id(None)  # Autoincrement

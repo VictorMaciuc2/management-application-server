@@ -63,9 +63,10 @@ class UserService:
         return ''.join(secrets.choice(alphabet) for i in range(20))
 
     def send_password_email(self, user):
-        gmail_user = 'colectivgrupa3@gmail.com'  # trebuie introduse
-        gmail_password = 'colectiv123!!!'  # cele corecte si adevarate ! ! !
-
+        #gmail_user = 'colectivgrupa3@gmail.com'  # trebuie introduse
+        #gmail_password = 'colectiv123!!!'  # cele corecte si adevarate ! ! !
+        gmail_user = 'ubbproiectcolectivg3@gmail.com'
+        gmail_password = 'asdasd123123!@#!@#'
         user.set_password(self.__get_generated_password())
 
         msg = EmailMessage()
@@ -81,8 +82,8 @@ class UserService:
             server.starttls()
             server.login(gmail_user, gmail_password)
             server.send_message(msg)
-        except smtplib.SMTPException:
-            raise ValueError("Could not send registration email.")
+        except smtplib.SMTPException as err:
+            raise ValueError("Could not send registration email." + str(err))
 
     def generate_token(self, user_id):
         user = self.__repo.getOne(user_id)
@@ -93,4 +94,4 @@ class UserService:
         }
 
         token = jwt.encode(payload, 'super-secret-key', algorithm='HS256')
-        return token.decode("utf-8")
+        return token#.decode("utf-8")
