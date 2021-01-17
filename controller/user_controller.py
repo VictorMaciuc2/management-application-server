@@ -58,6 +58,7 @@ def get_users():
 @auth_required_with_role([Role.administrator, Role.hr])
 def save_user():
     user = Mapper.get_instance().json_to_user(request.json)
+    user.set_id(None)
     try:
         user_service.send_password_email(user) # old, plain text password is used to send it as an email to the user
         print(user.get_password())
